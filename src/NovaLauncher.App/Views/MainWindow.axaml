@@ -1,0 +1,109 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:NovaLauncher.App.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        x:Class="NovaLauncher.App.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Width="1200" Height="780" MinWidth="1020" MinHeight="640"
+        WindowStartupLocation="CenterScreen"
+        Title="NovaLauncher · Minecraft 第三方启动器"
+        Background="#191C20">
+
+    <Window.Styles>
+        <Style Selector="Button.accent">
+            <Setter Property="Background" Value="#2F7CF6"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="Button.flat">
+            <Setter Property="Background" Value="#2A2F36"/>
+            <Setter Property="Foreground" Value="#E8EAED"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12,6"/>
+        </Style>
+        <Style Selector="Button.flat:hover">
+            <Setter Property="Background" Value="#3A414A"/>
+        </Style>
+        <Style Selector="Button.danger">
+            <Setter Property="Background" Value="#B3261E"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12,6"/>
+        </Style>
+        <Style Selector="TextBox, ComboBox">
+            <Setter Property="Background" Value="#22262C"/>
+            <Setter Property="Foreground" Value="#E8EAED"/>
+            <Setter Property="BorderBrush" Value="#3A414A"/>
+            <Setter Property="CornerRadius" Value="5"/>
+        </Style>
+        <Style Selector="ListBox">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="CornerRadius" Value="5"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected">
+            <Setter Property="Background" Value="#2F7CF6"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style Selector="ListBoxItem:pointerover">
+            <Setter Property="Background" Value="#31373F"/>
+        </Style>
+        <Style Selector="TextBlock.section">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+        </Style>
+        <Style Selector="TextBlock.label">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#9AA4B0"/>
+        </Style>
+        <Style Selector="TextBlock.status">
+            <Setter Property="Foreground" Value="#7CD4A8"/>
+        </Style>
+    </Window.Styles>
+
+    <DockPanel>
+        <!-- 左侧导航 -->
+        <Border DockPanel.Dock="Left" Width="210" Background="#14171B">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="18,22,18,10">
+                    <TextBlock Text="NovaLauncher" FontSize="19" FontWeight="Bold" Foreground="#FFFFFF"/>
+                    <TextBlock Text="Minecraft 启动器" FontSize="11" Foreground="#9AA4B0" Margin="2,2,0,18"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom" Margin="16,0,16,16">
+                    <TextBlock Text="跨平台 · C# / Avalonia" FontSize="10" Foreground="#5C6570" TextWrapping="Wrap"/>
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Pages}" Margin="10,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:NavItem">
+                            <Button Content="{Binding Title}"
+                                    Command="{Binding $parent[Window].DataContext.NavigateCommand}"
+                                    CommandParameter="{Binding}"
+                                    Background="Transparent" Foreground="#C9D1D9"
+                                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                    Padding="16,11" Margin="0,3" CornerRadius="6"
+                                    FontSize="14">
+                                <Button.Styles>
+                                    <Style Selector="Button:pointerover">
+                                        <Setter Property="Background" Value="#23282F"/>
+                                    </Style>
+                                </Button.Styles>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </DockPanel>
+        </Border>
+
+        <!-- 右侧内容 -->
+        <Border Background="#191C20" Padding="26,24">
+            <ContentControl Content="{Binding CurrentPage}"/>
+        </Border>
+    </DockPanel>
+</Window>

@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NovaLauncher.App.ViewModels"
+             x:Class="NovaLauncher.App.Views.LanPlayView"
+             x:DataType="vm:LanPlayViewModel">
+    <StackPanel Spacing="14">
+        <TextBlock Text="联机（虚拟局域网）" Classes="section"/>
+        <Border Background="#20242A" CornerRadius="10" Padding="16">
+            <StackPanel Spacing="8">
+                <TextBlock Text="{Binding BackendStatus}" Classes="status" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding VersionInfo}" Classes="label" FontSize="11"/>
+                <Grid ColumnDefinitions="Auto,Auto,Auto" ColumnSpacing="8">
+                    <Button Content="一键下载并安装 EasyTier 联机组件" Classes="accent" Command="{Binding InstallBackendCommand}"/>
+                    <Button Grid.Column="1" Content="检查更新" Classes="flat" Command="{Binding CheckUpdateCommand}"/>
+                    <Button Grid.Column="2" Content="升级 EasyTier" Classes="flat" IsVisible="{Binding HasUpdate}" Command="{Binding UpgradeCommand}"/>
+                </Grid>
+                <ProgressBar Minimum="0" Maximum="100" Value="{Binding InstallProgressValue}" Height="8" IsVisible="{Binding ShowInstallProgress}"/>
+                <TextBlock Text="自动下载 EasyTier（陶瓦联机底层，约 25MB），免去手动安装，可放到游戏目录 tools/ 下。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <Border Background="#20242A" CornerRadius="10" Padding="16">
+            <StackPanel Spacing="10">
+                <TextBlock Text="房间码" Classes="label"/>
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="8">
+                    <TextBox Text="{Binding RoomCode}" PlaceholderText="输入房间码（ABCD-EFGH），或点「创建房间」生成"/>
+                    <Button Grid.Column="1" Content="创建房间" Classes="flat" Command="{Binding CreateRoomCommand}"/>
+                    <Button Grid.Column="2" Content="复制房间码" Classes="flat" Command="{Binding CopyRoomCodeCommand}"/>
+                    <Button Grid.Column="3" Content="加入房间并开始" Classes="accent" Command="{Binding StartCommand}"/>
+                </Grid>
+                <TextBlock Text="说明：房主点「创建房间」→ 复制房间码发给好友 → 双方都点「开始」进入同一虚拟局域网 → 进游戏后房主按 Esc 点「对局域网开放」，好友在多人游戏里用「虚拟 IP:端口」连接。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <Border Background="#20242A" CornerRadius="10" Padding="16">
+            <StackPanel Spacing="8">
+                <TextBlock Text="{Binding Status}" Classes="status" TextWrapping="Wrap"/>
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                    <TextBlock Text="虚拟 IP：" Classes="label" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{Binding VirtualIp}" FontFamily="monospace" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <Button Grid.Column="3" Content="停止联机" Classes="flat" IsVisible="{Binding IsRunning}" Command="{Binding StopCommand}"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <Border Background="#20242A" CornerRadius="10" Padding="16">
+            <StackPanel Spacing="8">
+                <TextBlock Text="常见问题" Classes="label"/>
+                <TextBlock Text="· 联机需安装组网组件：陶瓦联机（Terracotta）或 EasyTier，可放在游戏目录 tools/ 下。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                <TextBlock Text="· 不同启动器（HMCL/PCL/FMCL）若也支持陶瓦联机，可互通。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                <TextBlock Text="· 虚拟局域网联机稳定性取决于网络，适合好友间共同游玩，不能替代专用服务器。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

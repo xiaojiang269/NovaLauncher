@@ -1,0 +1,94 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NovaLauncher.App.ViewModels"
+             x:Class="NovaLauncher.App.Views.ModsView"
+             x:DataType="vm:ModsViewModel">
+    <StackPanel Spacing="16" MaxWidth="860">
+        <TextBlock Text="模组管理" Classes="section"/>
+        <TextBlock Text="{Binding Status}" Classes="status"/>
+
+        <Border Background="#20242A" CornerRadius="10" Padding="18">
+            <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="160,*" ColumnSpacing="10">
+                    <TextBlock Text="选择版本" VerticalAlignment="Center" Classes="label"/>
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding Versions}"
+                              SelectedItem="{Binding SelectedVersion}"/>
+                </Grid>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <TextBlock Grid.Column="0" Text="mods 目录中的文件（.jar 为模组，.zip 为资源包）" Classes="label" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <Button Content="检测冲突" Classes="flat" Command="{Binding DetectConflictsCommand}"/>
+                        <Button Content="检查依赖" Classes="flat" Command="{Binding CheckDepsCommand}"/>
+                        <Button Content="打开模组文件夹" Classes="flat" Command="{Binding OpenFolderCommand}"/>
+                    </StackPanel>
+                </Grid>
+
+                <ListBox ItemsSource="{Binding Mods}" SelectedItem="{Binding SelectedMod}" Height="260">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="70,*,Auto,Auto">
+                                <TextBlock Grid.Column="0" Text="启用" Foreground="#7CD4A8" VerticalAlignment="Center"
+                                           IsVisible="{Binding Enabled}"/>
+                                <TextBlock Grid.Column="0" Text="禁用" Foreground="#9AA4B0" VerticalAlignment="Center"
+                                           IsVisible="{Binding !Enabled}"/>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="{Binding DisplayName}"/>
+                                    <TextBlock Text="{Binding Kind}" Classes="label" FontSize="11"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="2" Text="{Binding SizeText}" Classes="label" VerticalAlignment="Center" Margin="0,0,14,0"/>
+                                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6">
+                                    <Button Content="切换" Classes="flat"
+                                            Command="{Binding $parent[ListBox].DataContext.ToggleSelectedCommand}"/>
+                                    <Button Content="删除" Classes="danger"
+                                            Command="{Binding $parent[ListBox].DataContext.DeleteSelectedCommand}"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </Border>
+
+        <Border Background="#20242A" CornerRadius="10" Padding="18" IsVisible="{Binding ShowConflicts}">
+            <StackPanel Spacing="10">
+                <TextBlock Text="⚠ 模组冲突" Classes="section" FontSize="14"/>
+                <TextBlock Text="同一模组存在多个 jar，可能导致无法启动或报错，请保留一个版本、删除其余。" Classes="label" TextWrapping="Wrap"/>
+                <ItemsControl ItemsSource="{Binding Conflicts}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Spacing="4" Margin="0,0,0,10">
+                                <TextBlock Text="{Binding ModId, StringFormat='模组 {0}'}" FontWeight="SemiBold" Foreground="#FFD76A"/>
+                                <ItemsControl ItemsSource="{Binding Files}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding FileName}" Foreground="#FF9D8A" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+        <Border Background="#20242A" CornerRadius="10" Padding="18" IsVisible="{Binding ShowMissingDeps}">
+            <StackPanel Spacing="10">
+                <TextBlock Text="⚠ 缺失的前置模组" Classes="section" FontSize="14"/>
+                <TextBlock Text="以下模组声明了必装的依赖，但当前 mods 目录中缺少对应模组，启动时可能报错。可用「模组下载」搜索安装。" Classes="label" TextWrapping="Wrap"/>
+                <ItemsControl ItemsSource="{Binding MissingDeps}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,2">
+                                <TextBlock Text="缺少依赖：" Foreground="#FF9D8A" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{Binding DepModId}" FontWeight="SemiBold" Foreground="#FFD76A" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="2" Text="{Binding VersionRange}" Classes="label" FontSize="11" Margin="6,0,0,0"/>
+                                <TextBlock Grid.Column="3" Text="{Binding Mod}" Classes="label" FontSize="11" TextTrimming="CharacterEllipsis" Margin="12,0,0,0"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

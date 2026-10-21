@@ -1,0 +1,102 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NovaLauncher.App.ViewModels"
+             x:Class="NovaLauncher.App.Views.ModDownloadView"
+             x:DataType="vm:ModDownloadViewModel">
+    <StackPanel Spacing="14">
+        <TextBlock Text="模组下载" Classes="section"/>
+        <TextBlock Text="{Binding Status}" Classes="status" TextWrapping="Wrap"/>
+
+        <!-- 搜索区 -->
+        <Border Background="#20242A" CornerRadius="10" Padding="16">
+            <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="Auto,130,140,*,Auto" ColumnSpacing="8">
+                    <ComboBox Grid.Column="0" Width="110" ItemsSource="{Binding Sources}" SelectedIndex="{Binding SourceIndex}"/>
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding ProjectTypes}" SelectedIndex="{Binding ProjectTypeIndex}"/>
+                    <ComboBox Grid.Column="2" ItemsSource="{Binding GameVersions}" SelectedItem="{Binding GameVersion}"/>
+                    <ComboBox Grid.Column="3" ItemsSource="{Binding Loaders}" SelectedIndex="{Binding LoaderIndex}"/>
+                    <TextBox Grid.Column="4" Text="{Binding SearchText}" PlaceholderText="搜索模组/光影/资源包，如 sodium / complementary…">
+                        <TextBox.KeyBindings>
+                            <KeyBinding Gesture="Enter" Command="{Binding SearchCommand}"/>
+                        </TextBox.KeyBindings>
+                    </TextBox>
+                    <Button Grid.Column="5" Content="搜索" Classes="accent" Command="{Binding SearchCommand}"/>
+                </Grid>
+                <TextBlock Text="数据源：Modrinth 开放 API（免费无需 Key，覆盖大量主流模组）；CurseForge（需在设置填 API Key，覆盖更多 Forge/老模组）。两者基本覆盖 MC百科收录的主流模组。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 结果区 -->
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+            <!-- 模组列表 -->
+            <Border Background="#20242A" CornerRadius="10" Padding="12">
+                <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="搜索结果" Classes="label" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="批量下载全部到目标版本" Classes="accent" FontSize="11"
+                                Command="{Binding DownloadAllCommand}"/>
+                    </Grid>
+                    <ListBox ItemsSource="{Binding Projects}" SelectedItem="{Binding SelectedProject}" Height="360">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="1" Text="✓ 已下载" Foreground="#5AD48A" FontSize="10" VerticalAlignment="Center" IsVisible="{Binding Downloaded}"/>
+                                    </Grid>
+                                    <TextBlock Text="{Binding Description}" Classes="label" FontSize="11" TextTrimming="CharacterEllipsis" MaxLines="2" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Downloads, StringFormat='⬇ {0:N0} 次下载'}" Classes="label" FontSize="10"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+
+            <!-- 版本列表 -->
+            <Border Background="#20242A" CornerRadius="10" Padding="12">
+                <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="可用版本（选中后下载）" Classes="label" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="打开目标 mods 文件夹" Classes="flat" FontSize="11" Command="{Binding OpenTargetModsFolderCommand}"/>
+                    </Grid>
+                    <ListBox ItemsSource="{Binding Versions}" SelectedItem="{Binding SelectedVersion}" Height="300">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel LastChildFill="True">
+                                    <Button DockPanel.Dock="Right" Content="下载" Classes="accent" FontSize="11" Padding="10,4"
+                                            Command="{Binding $parent[ListBox].DataContext.DownloadCommand}"
+                                            CommandParameter="{Binding}"/>
+                                    <StackPanel VerticalAlignment="Center" Margin="0,0,10,0">
+                                        <TextBlock Text="{Binding VersionNumber}" FontWeight="SemiBold"/>
+                                        <TextBlock Classes="label" FontSize="10" TextTrimming="CharacterEllipsis">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}{0} · {1}">
+                                                    <Binding Path="GameVersions[0]"/>
+                                                    <Binding Path="Loaders[0]"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <TextBlock Text="下载到版本：" Classes="label" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding LocalVersions}" SelectedItem="{Binding TargetVersion}"/>
+                        <Button Grid.Column="2" Content="刷新" Classes="flat" Command="{Binding RefreshCommand}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- 进度 -->
+        <Border IsVisible="{Binding ShowProgress}" Background="#20242A" CornerRadius="10" Padding="14">
+            <StackPanel Spacing="8">
+                <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" Height="10"/>
+                <TextBlock Text="正在下载模组文件…" Classes="status" FontSize="11"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

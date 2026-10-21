@@ -1,0 +1,75 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NovaLauncher.App.ViewModels"
+             x:Class="NovaLauncher.App.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="16" MaxWidth="820">
+            <TextBlock Text="设置" Classes="section"/>
+            <TextBlock Text="{Binding Status}" Classes="status"/>
+
+            <Border Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="路径与运行时" Classes="label"/>
+
+                    <Grid ColumnDefinitions="150,*,Auto" ColumnSpacing="10">
+                        <TextBlock Text="游戏目录" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" Text="{Binding GameDir}"/>
+                        <TextBlock Grid.Column="2" Text="重新启动后生效" Classes="label" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="150,*,Auto" ColumnSpacing="10">
+                        <TextBlock Text="Java 路径" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" Text="{Binding JavaPath}" PlaceholderText="留空则自动检测系统 Java"/>
+                        <Button Grid.Column="2" Content="浏览…" Classes="flat" Command="{Binding PickJavaCommand}"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="150,*,Auto" ColumnSpacing="10">
+                        <TextBlock Text="下载镜像" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding DownloadMirrors}" SelectedIndex="{Binding DownloadMirror}"/>
+                        <TextBlock Grid.Column="2" Text="国内建议 BMCLAPI" Classes="label" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="游戏性能" Classes="label"/>
+                    <Grid ColumnDefinitions="150,*,150,*" ColumnSpacing="10" RowDefinitions="Auto,Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="最小内存 (MB)" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding MinMemoryMb}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="最大内存 (MB)" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding MaxMemoryMb}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="窗口宽度" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding WindowWidth}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="窗口高度" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding WindowHeight}"/>
+                    </Grid>
+                    <CheckBox Content="全屏启动" IsChecked="{Binding Fullscreen}"/>
+                    <Grid ColumnDefinitions="150,*" ColumnSpacing="10">
+                        <TextBlock Text="额外 JVM 参数" VerticalAlignment="Top"/>
+                        <TextBox Grid.Column="1" Text="{Binding ExtraJvmArgs}" AcceptsReturn="True" Height="60"
+                                 PlaceholderText="如：-XX:+UseG1GC  -XX:-OmitStackTraceInFastThrow（空格分隔）"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="微软登录（可选）" Classes="label"/>
+                    <TextBlock Text="在 Azure 门户注册桌面应用，填入其 ClientId 即可启用正版微软账号登录（Device Code 流程）。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                    <TextBox Text="{Binding MicrosoftClientId}" PlaceholderText="Microsoft ClientId（留空则仅离线登录）"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="模组下载数据源（可选）" Classes="label"/>
+                    <TextBlock Text="Modrinth 源免费无需 Key；填入 CurseForge API Key 后可在模组下载中使用 CurseForge 源（需在 https://console.curseforge.com 申请）。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                    <TextBox Text="{Binding CurseForgeApiKey}" PlaceholderText="CurseForge API Key（留空则模组下载仅用 Modrinth）"/>
+                </StackPanel>
+            </Border>
+
+            <Button Content="保存设置" Classes="accent" HorizontalAlignment="Right" Command="{Binding SaveCommand}"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

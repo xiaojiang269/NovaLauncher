@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NovaLauncher.App.ViewModels"
+             x:Class="NovaLauncher.App.Views.VersionsView"
+             x:DataType="vm:VersionsViewModel">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="18" MaxWidth="980">
+
+            <TextBlock Text="版本管理" Classes="section"/>
+            <TextBlock Text="{Binding Status}" Classes="status" TextWrapping="Wrap"/>
+
+            <!-- 本地版本 -->
+            <Border Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="本地已安装版本" Classes="label" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <Button Content="刷新" Classes="flat" Command="{Binding RefreshCommand}"/>
+                            <Button Content="导入整合包" Classes="flat" Command="{Binding ImportPackCommand}"/>
+                            <Button Content="导出整合包" Classes="flat" Command="{Binding ExportPackCommand}"/>
+                            <Button Content="删除" Classes="danger" Command="{Binding DeleteVersionCommand}"/>
+                        </StackPanel>
+                    </Grid>
+                    <ListBox ItemsSource="{Binding LocalVersions}"
+                             SelectedItem="{Binding SelectedLocalVersion}"
+                             MaxHeight="180" HorizontalAlignment="Stretch">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+
+            <!-- 官方版本下载 -->
+            <Border Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <TextBlock Grid.Column="0" Text="官方版本下载" Classes="label" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" Text="{Binding SearchText}" Width="220" PlaceholderText="搜索版本…"/>
+                    </Grid>
+                    <TextBlock Text="{Binding OfficialCount}" Classes="status" FontSize="11"/>
+                    <ListBox ItemsSource="{Binding OfficialVersions}" MaxHeight="220">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel LastChildFill="True">
+                                    <Button DockPanel.Dock="Right" Content="安装" Classes="flat"
+                                            Command="{Binding $parent[ListBox].DataContext.InstallOfficialCommand}"
+                                            CommandParameter="{Binding Id}"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Id}"/>
+                                        <TextBlock Text="{Binding Type}" Classes="label" FontSize="11"/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </Border>
+
+            <!-- 加载器安装 -->
+            <Border Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="加载器安装" Classes="label"/>
+
+                    <!-- Fabric -->
+                    <Border Background="#1B1F24" CornerRadius="8" Padding="14">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Fabric" FontWeight="Bold"/>
+                            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
+                                <TextBox Grid.Column="0" Text="{Binding FabricMcVersion}" PlaceholderText="游戏版本，如 1.20.1"/>
+                                <Button Grid.Column="1" Content="加载 Loader" Classes="flat" Command="{Binding LoadFabricLoadersCommand}"/>
+                                <ComboBox Grid.Column="2" Width="200"
+                                          ItemsSource="{Binding FabricLoaders}"
+                                          SelectedItem="{Binding SelectedFabricLoader}"/>
+                                <Button Grid.Column="3" Content="安装" Classes="accent" Command="{Binding InstallFabricCommand}"/>
+                            </Grid>
+                            <TextBlock Text="安装 Fabric 后即可在模组管理页放置 Fabric 模组。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Forge -->
+                    <Border Background="#1B1F24" CornerRadius="8" Padding="14">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Forge" FontWeight="Bold"/>
+                            <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
+                                <TextBox Grid.Column="0" Text="{Binding ForgeMcVersion}" PlaceholderText="游戏版本，如 1.20.1"/>
+                                <TextBox Grid.Column="1" Text="{Binding ForgeVersion}" PlaceholderText="Forge 版本，如 47.1.0"/>
+                                <Button Grid.Column="2" Content="下载并安装" Classes="accent" Command="{Binding InstallForgeCommand}"/>
+                            </Grid>
+                            <TextBlock Text="Forge 通过官方 Installer 安装，需要本机已安装对应 Java 版本，安装过程较慢。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- 进度 -->
+            <Border IsVisible="{Binding ShowProgress}" Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="8">
+                    <ProgressBar Minimum="0" Maximum="{Binding ProgressMax}" Value="{Binding ProgressValue}" Height="10"/>
+                    <TextBlock Text="{Binding ProgressText}" Classes="status" FontSize="11" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

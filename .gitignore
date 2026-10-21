@@ -1,0 +1,16 @@
+# 编译产物
+bin/
+obj/
+*.user
+*.suo
+
+# 发布产物（源码开源，二进制作为 Release 资产另发）
+dist/
+
+# 临时验证与截图
+.verify/
+.shot/
+
+# 系统
+.DS_Store
+Thumbs.db

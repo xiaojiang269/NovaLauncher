@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NovaLauncher.App.ViewModels"
+             x:Class="NovaLauncher.App.Views.ServersView"
+             x:DataType="vm:ServersViewModel">
+    <StackPanel Spacing="16" MaxWidth="880">
+        <TextBlock Text="服务器快捷入口" Classes="section"/>
+        <TextBlock Text="{Binding Status}" Classes="status" TextWrapping="Wrap"/>
+
+        <Border Background="#20242A" CornerRadius="10" Padding="18">
+            <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <TextBlock Grid.Column="0" Text="我的服务器" Classes="label" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <Button Content="新建" Classes="flat" Command="{Binding NewCommand}"/>
+                        <Button Content="编辑" Classes="flat" Command="{Binding EditSelectedCommand}"/>
+                        <Button Content="删除" Classes="danger" Command="{Binding DeleteSelectedCommand}"/>
+                    </StackPanel>
+                </Grid>
+
+                <ListBox ItemsSource="{Binding Servers}" SelectedItem="{Binding Selected}" Height="240">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding FullAddress}" Classes="status" FontSize="11"/>
+                                <TextBlock Text="{Binding Description}" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- 编辑表单 -->
+                <Border IsVisible="{Binding IsEditing}" Background="#1B1F24" CornerRadius="8" Padding="14">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="编辑服务器" Classes="label"/>
+                        <Grid ColumnDefinitions="90,*,90,150" ColumnSpacing="8" RowDefinitions="Auto,Auto">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="名称" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EditName}"/>
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="地址" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding EditAddress}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="端口" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EditPort}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="描述" VerticalAlignment="Center"/>
+                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding EditDescription}"/>
+                        </Grid>
+                        <Button Content="保存" Classes="accent" HorizontalAlignment="Right" Command="{Binding SaveEntryCommand}"/>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="提示：在“主页”选择版本并登录后启动游戏，即可进入多人游戏。可在此记录常玩服务器的地址与端口。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

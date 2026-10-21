@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NovaLauncher.App.ViewModels"
+             x:Class="NovaLauncher.App.Views.HomeView"
+             x:DataType="vm:HomeViewModel">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="16" MaxWidth="860">
+
+            <!-- 账号区 -->
+            <Border Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="账号" Classes="section"/>
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
+                        <TextBox Grid.Column="0" Text="{Binding AccountName}" PlaceholderText="游戏昵称（离线登录用）" IsEnabled="{Binding !IsBusy}"/>
+                        <Button Grid.Column="1" Content="离线登录" Classes="flat" Command="{Binding LoginOfflineCommand}"/>
+                        <Button Grid.Column="2" Content="微软登录" Classes="flat" Command="{Binding LoginMicrosoftCommand}"/>
+                        <Button Grid.Column="3" Content="外置登录" Classes="flat" Command="{Binding ToggleExternalPanelCommand}"/>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="当前账号类型：" Classes="label" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding AccountType}" Classes="status" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- 第三方认证服务器登录面板 -->
+                    <Border IsVisible="{Binding ShowExternalPanel}" Background="#1B1F24" CornerRadius="8" Padding="12">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="第三方认证服务器登录（外置登录）" Classes="label"/>
+                            <TextBox Text="{Binding ExternalApi}" PlaceholderText="认证服务器 API，如 https://littleskin.cn/api/yggdrasil"/>
+                            <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
+                                <TextBox Grid.Column="0" Text="{Binding ExternalUser}" PlaceholderText="账号 / 邮箱"/>
+                                <TextBox Grid.Column="1" Text="{Binding ExternalPassword}" PlaceholderText="密码" PasswordChar="●"/>
+                                <Button Grid.Column="2" Content="登录" Classes="accent" Command="{Binding ExternalLoginCommand}"/>
+                            </Grid>
+                            <TextBlock Text="通过 authlib-injector 使用第三方皮肤站账号登录，可进入开启正版验证的服务器。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="{Binding Status}" Classes="status" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 启动配置区 -->
+            <Border Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="启动配置" Classes="section"/>
+
+                    <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="12">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="游戏版本" VerticalAlignment="Center" Classes="label"/>
+                        <ComboBox Grid.Row="0" Grid.Column="1"
+                                  ItemsSource="{Binding Versions}"
+                                  SelectedItem="{Binding SelectedVersion}"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Java 运行时" VerticalAlignment="Center" Classes="label"/>
+                        <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <ComboBox ItemsSource="{Binding JavaList}"
+                                      SelectedItem="{Binding SelectedJava}"
+                                      HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Path}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <Button Grid.Column="1" Content="下载所需Java" Classes="flat" FontSize="11"
+                                    Command="{Binding DownloadJavaCommand}"/>
+                        </Grid>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="内存 (MB)" VerticalAlignment="Center" Classes="label"/>
+                        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <TextBox Text="{Binding MinMemoryMb}" Width="140" PlaceholderText="最小"/>
+                            <TextBlock Text="—" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding MaxMemoryMb}" Width="140" PlaceholderText="最大"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" Margin="0,6,0,0">
+                        <Button Content="启动游戏" Classes="accent" FontSize="16" Padding="34,12"
+                                Command="{Binding LaunchCommand}"/>
+                        <Button Content="下载补全" Classes="flat" Command="{Binding DownloadVersionCommand}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- 进度 -->
+            <Border IsVisible="{Binding ShowProgress}" Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="下载进度" Classes="label"/>
+                    <ProgressBar Minimum="0" Maximum="{Binding ProgressMax}" Value="{Binding ProgressValue}" Height="10"/>
+                    <TextBlock Text="{Binding ProgressText}" Classes="status" FontSize="11" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 日志 -->
+            <Border IsVisible="{Binding ShowGameLog}" Background="#20242A" CornerRadius="10" Padding="18">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="游戏 / 启动日志" Classes="label"/>
+                    <TextBox Text="{Binding GameLog}" Height="220" IsReadOnly="True"
+                             TextWrapping="Wrap" AcceptsReturn="True"
+                             FontFamily="monospace" FontSize="11"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

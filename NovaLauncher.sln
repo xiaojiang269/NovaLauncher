@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B216C104-A93B-49AD-B61C-DC9DDC0F3B6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NovaLauncher.Core", "src\NovaLauncher.Core\NovaLauncher.Core.csproj", "{07499EA2-3695-48CE-90FF-3444AC15C84C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NovaLauncher.App", "src\NovaLauncher.App\NovaLauncher.App.csproj", "{FBC31215-AE3F-458C-8BDE-2D95B048F48F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{07499EA2-3695-48CE-90FF-3444AC15C84C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07499EA2-3695-48CE-90FF-3444AC15C84C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07499EA2-3695-48CE-90FF-3444AC15C84C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07499EA2-3695-48CE-90FF-3444AC15C84C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBC31215-AE3F-458C-8BDE-2D95B048F48F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBC31215-AE3F-458C-8BDE-2D95B048F48F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBC31215-AE3F-458C-8BDE-2D95B048F48F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBC31215-AE3F-458C-8BDE-2D95B048F48F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{07499EA2-3695-48CE-90FF-3444AC15C84C} = {B216C104-A93B-49AD-B61C-DC9DDC0F3B6D}
+		{FBC31215-AE3F-458C-8BDE-2D95B048F48F} = {B216C104-A93B-49AD-B61C-DC9DDC0F3B6D}
+	EndGlobalSection
+EndGlobal
