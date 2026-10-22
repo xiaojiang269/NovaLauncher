@@ -42,7 +42,7 @@
                     </StackPanel>
 
                     <!-- 外置登录面板 -->
-                    <Border IsVisible="{Binding ShowExternalPanel}" Background="#FFFFFFCC" CornerRadius="14" Padding="14"
+                    <Border IsVisible="{Binding ShowExternalPanel}" Background="#FFFFFF33" CornerRadius="14" Padding="14"
                             BorderBrush="#D8DBE8" BorderThickness="1">
                         <StackPanel Spacing="10">
                             <TextBlock Text="第三方认证服务器登录（外置登录）" FontSize="13" FontWeight="SemiBold" Foreground="#5A5E7A"/>

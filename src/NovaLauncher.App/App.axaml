@@ -206,13 +206,14 @@
             </Setter>
         </Style>
 
-        <!-- 卡片：半透明白色毛玻璃 -->
+        <!-- 卡片：液态玻璃效果 -->
         <Style Selector="Border.card">
-            <Setter Property="Background" Value="#F2F3F9CC"/>
-            <Setter Property="CornerRadius" Value="16"/>
-            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Background" Value="#FFFFFF55"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="22"/>
             <Setter Property="BorderBrush" Value="#FFFFFF88"/>
             <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BoxShadow" Value="0 8 32 0 #00000050"/>
         </Style>
     </Application.Styles>
 </Application>

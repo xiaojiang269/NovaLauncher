@@ -11,42 +11,45 @@
         Title="NovaLauncher · Minecraft 第三方启动器">
 
     <Window.Background>
-        <ImageBrush Source="avares://NovaLauncher/Assets/background.jpg" Stretch="UniformToFill"/>
+        <ImageBrush Source="avares://NovaLauncher/Assets/background.jpg" Stretch="UniformToFill" AlignmentY="Top"/>
     </Window.Background>
 
     <Window.Styles>
         <Style Selector="ListBoxItem.navitem">
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Margin" Value="0,2"/>
-            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="CornerRadius" Value="12"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         </Style>
         <Style Selector="ListBoxItem.navitem:selected">
-            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Background" Value="#FFFFFF55"/>
         </Style>
         <Style Selector="ListBoxItem.navitem:pointerover">
-            <Setter Property="Background" Value="#FFFFFF88"/>
+            <Setter Property="Background" Value="#FFFFFF33"/>
         </Style>
     </Window.Styles>
 
-    <!-- 全局半透明白色覆盖，让背景图柔和 -->
+    <!-- 冷色调半透明覆盖，让银河背景透出来 -->
     <Grid>
-        <Border Background="#FFFFFFB0"/>
+        <Border Background="#15194088"/>
 
         <DockPanel>
-            <!-- 左侧导航栏：半透明毛玻璃 -->
-            <Border DockPanel.Dock="Left" Width="210" Background="#E8EAF5E6">
+            <!-- 左侧导航栏：液态玻璃 -->
+            <Border DockPanel.Dock="Left" Width="210" Background="#FFFFFF18"
+                    BorderBrush="#FFFFFF44" BorderThickness="0,0,1,0">
                 <DockPanel>
                     <!-- Logo 区域 -->
-                    <Border DockPanel.Dock="Top" Padding="20,24,20,18" Background="#FFFFFF99">
+                    <Border DockPanel.Dock="Top" Padding="20,24,20,18" Background="#FFFFFF22"
+                            BorderBrush="#FFFFFF33" BorderThickness="0,0,0,1">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Border Width="38" Height="38" CornerRadius="10" Background="#7C4DFF" VerticalAlignment="Center">
+                            <Border Width="38" Height="38" CornerRadius="10" Background="#7C4DFF" VerticalAlignment="Center"
+                                    BoxShadow="0 4 12 0 #7C4DFF66">
                                 <TextBlock Text="🎮" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="NovaLauncher" FontSize="17" FontWeight="Bold" Foreground="#1A1B2E"/>
-                                <TextBlock Text="Minecraft 启动器" FontSize="10" Foreground="#8A8EA8"/>
+                                <TextBlock Text="NovaLauncher" FontSize="17" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                <TextBlock Text="Minecraft 启动器" FontSize="10" Foreground="#FFFFFF99"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -54,8 +57,8 @@
                     <!-- 底部信息 -->
                     <Border DockPanel.Dock="Bottom" Padding="16,12">
                         <StackPanel Spacing="2">
-                            <TextBlock Text="v1.1.0" FontSize="10" Foreground="#8A8EA8"/>
-                            <TextBlock Text="跨平台 · C# / Avalonia" FontSize="9" Foreground="#B0B3C8"/>
+                            <TextBlock Text="v1.2.0" FontSize="10" Foreground="#FFFFFF88"/>
+                            <TextBlock Text="跨平台 · C# / Avalonia" FontSize="9" Foreground="#FFFFFF55"/>
                         </StackPanel>
                     </Border>
 
@@ -70,7 +73,7 @@
                             <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
                                 <Setter Property="Padding" Value="0"/>
                                 <Setter Property="Margin" Value="0,2"/>
-                                <Setter Property="CornerRadius" Value="10"/>
+                                <Setter Property="CornerRadius" Value="12"/>
                                 <Setter Property="Background" Value="Transparent"/>
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                             </ControlTheme>
@@ -79,15 +82,15 @@
                             <DataTemplate x:DataType="vm:NavItem">
                                 <Grid ColumnDefinitions="4,40,*" Height="44">
                                     <Border Grid.Column="0" Width="3" CornerRadius="2" VerticalAlignment="Stretch"
-                                            Background="#7C4DFF" Margin="0,8,0,8"
+                                            Background="#FFFFFF" Margin="0,8,0,8"
                                             IsVisible="{Binding $parent[ListBoxItem].IsSelected}"/>
                                     <Border Grid.Column="1" Width="32" Height="32" CornerRadius="8"
-                                            Background="#FFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                            Background="#FFFFFF33" VerticalAlignment="Center" HorizontalAlignment="Center">
                                         <TextBlock Text="{Binding Icon}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Border>
                                     <TextBlock Grid.Column="2" Text="{Binding Title}" FontSize="14"
                                                VerticalAlignment="Center" Margin="6,0,0,0"
-                                               Foreground="#3A3D5C"/>
+                                               Foreground="#FFFFFFDD"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
