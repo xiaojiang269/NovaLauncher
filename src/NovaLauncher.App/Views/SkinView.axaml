@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NovaLauncher.App.ViewModels"
+             x:Class="NovaLauncher.App.Views.SkinView"
+             x:DataType="vm:SkinViewModel">
+    <StackPanel Spacing="16" MaxWidth="880">
+        <TextBlock Text="皮肤库" Classes="section"/>
+        <TextBlock Text="使用皮肤库 · 记录所有已导入皮肤" Classes="subsection"/>
+        <TextBlock Text="{Binding Status}" Classes="status" TextWrapping="Wrap"/>
+
+        <Border Background="#222336" CornerRadius="14" Padding="18">
+            <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <TextBlock Grid.Column="0" Text="已导入皮肤" Classes="label" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <Button Content="导入皮肤" Classes="accent" Command="{Binding ImportCommand}"/>
+                        <Button Content="选用" Classes="flat" Command="{Binding ActivateCommand}"/>
+                        <Button Content="删除" Classes="danger" Command="{Binding DeleteCommand}"/>
+                    </StackPanel>
+                </Grid>
+
+                <ListBox ItemsSource="{Binding Skins}" SelectedItem="{Binding Selected}" Height="360"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border Width="150" Margin="4" Padding="10" CornerRadius="12" Background="#1C1D2E">
+                                <StackPanel Spacing="8">
+                                    <Border Height="120" Background="#151A26" CornerRadius="8" HorizontalAlignment="Stretch">
+                                        <Image Source="{Binding Preview}" Stretch="Uniform" Margin="6"/>
+                                    </Border>
+                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding ImportedAt}" Classes="label" FontSize="10" TextAlignment="Center"/>
+                                    <Border Background="#69F0AE22" CornerRadius="6" Padding="4" HorizontalAlignment="Center" IsVisible="{Binding IsActive}">
+                                        <TextBlock Text="✓ 使用中" Foreground="#69F0AE" FontSize="10" FontWeight="Bold"/>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <TextBlock Text="提示：导入本地皮肤图片（PNG/JPG/GIF）到皮肤库，可随时预览、选用或删除。选用后下次启动游戏即生效。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>
