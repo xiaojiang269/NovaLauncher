@@ -5,7 +5,7 @@
              x:DataType="vm:LanPlayViewModel">
     <StackPanel Spacing="14">
         <TextBlock Text="联机（虚拟局域网）" Classes="section"/>
-        <Border Background="#FFFFFF40" CornerRadius="14" Padding="16">
+        <Border Background="#222336" CornerRadius="14" Padding="16">
             <StackPanel Spacing="8">
                 <TextBlock Text="{Binding BackendStatus}" Classes="status" TextWrapping="Wrap"/>
                 <TextBlock Text="{Binding VersionInfo}" Classes="label" FontSize="11"/>
@@ -19,7 +19,7 @@
             </StackPanel>
         </Border>
 
-        <Border Background="#FFFFFF40" CornerRadius="14" Padding="16">
+        <Border Background="#222336" CornerRadius="14" Padding="16">
             <StackPanel Spacing="10">
                 <TextBlock Text="房间码" Classes="label"/>
                 <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="8">
@@ -32,7 +32,7 @@
             </StackPanel>
         </Border>
 
-        <Border Background="#FFFFFF40" CornerRadius="14" Padding="16">
+        <Border Background="#222336" CornerRadius="14" Padding="16">
             <StackPanel Spacing="8">
                 <TextBlock Text="{Binding Status}" Classes="status" TextWrapping="Wrap"/>
                 <Grid ColumnDefinitions="Auto,Auto,*,Auto">
@@ -43,7 +43,7 @@
             </StackPanel>
         </Border>
 
-        <Border Background="#FFFFFF40" CornerRadius="14" Padding="16">
+        <Border Background="#222336" CornerRadius="14" Padding="16">
             <StackPanel Spacing="8">
                 <TextBlock Text="常见问题" Classes="label"/>
                 <TextBlock Text="· 联机需安装组网组件：陶瓦联机（Terracotta）或 EasyTier，可放在游戏目录 tools/ 下。" Classes="label" FontSize="11" TextWrapping="Wrap"/>

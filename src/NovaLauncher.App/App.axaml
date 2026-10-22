@@ -2,35 +2,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="NovaLauncher.App.App"
              xmlns:local="using:NovaLauncher.App"
-             RequestedThemeVariant="Light">
+             RequestedThemeVariant="Dark">
 
     <Application.Resources>
         <ResourceDictionary>
-            <!-- 光亮主题配色 -->
-            <Color x:Key="TextPrimary">#1A1B2E</Color>
-            <Color x:Key="TextSecondary">#5A5E7A</Color>
-            <Color x:Key="TextMuted">#8A8EA8</Color>
-            <Color x:Key="CardBg">#F5F6FA</Color>
-            <Color x:Key="CardBgSolid">#FFFFFF</Color>
-            <Color x:Key="InputBg">#FFFFFF</Color>
-            <Color x:Key="BorderColor">#D8DBE8</Color>
-            <Color x:Key="NavBg">#EDEFF7</Color>
+            <Color x:Key="BgMain">#1A1B26</Color>
+            <Color x:Key="BgNav">#13131C</Color>
+            <Color x:Key="BgCard">#222336</Color>
+            <Color x:Key="BgInput">#1C1D2E</Color>
+            <Color x:Key="BorderColor">#2E3048</Color>
+            <Color x:Key="TextPrimary">#E8EAF6</Color>
+            <Color x:Key="TextSecondary">#9AA0B8</Color>
+            <Color x:Key="TextMuted">#5C6080</Color>
             <Color x:Key="AccentPurple">#7C4DFF</Color>
             <Color x:Key="AccentBlue">#536DFE</Color>
-            <Color x:Key="AccentCyan">#00B8D4</Color>
-            <Color x:Key="AccentGreen">#00C853</Color>
+            <Color x:Key="AccentGreen">#69F0AE</Color>
             <Color x:Key="AccentRed">#FF5252</Color>
 
+            <SolidColorBrush x:Key="BgMainBrush" Color="{StaticResource BgMain}"/>
+            <SolidColorBrush x:Key="BgNavBrush" Color="{StaticResource BgNav}"/>
+            <SolidColorBrush x:Key="BgCardBrush" Color="{StaticResource BgCard}"/>
+            <SolidColorBrush x:Key="BgInputBrush" Color="{StaticResource BgInput}"/>
+            <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
             <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
             <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
             <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMuted}"/>
-            <SolidColorBrush x:Key="CardBgBrush" Color="{StaticResource CardBg}"/>
-            <SolidColorBrush x:Key="CardBgSolidBrush" Color="{StaticResource CardBgSolid}"/>
-            <SolidColorBrush x:Key="InputBgBrush" Color="{StaticResource InputBg}"/>
-            <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
-            <SolidColorBrush x:Key="NavBgBrush" Color="{StaticResource NavBg}"/>
             <SolidColorBrush x:Key="AccentPurpleBrush" Color="{StaticResource AccentPurple}"/>
-            <SolidColorBrush x:Key="AccentBlueBrush" Color="{StaticResource AccentBlue}"/>
             <SolidColorBrush x:Key="AccentGreenBrush" Color="{StaticResource AccentGreen}"/>
         </ResourceDictionary>
     </Application.Resources>
@@ -42,19 +39,17 @@
     <Application.Styles>
         <FluentTheme />
 
-        <!-- 全局控件样式：光亮主题 -->
         <Style Selector="Window">
-            <Setter Property="Background" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource BgMainBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI, sans-serif"/>
         </Style>
-
         <Style Selector="UserControl">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
         </Style>
 
-        <!-- 主按钮：蓝紫渐变 -->
+        <!-- 主按钮 -->
         <Style Selector="Button.accent">
             <Setter Property="Background">
                 <Setter.Value>
@@ -101,22 +96,20 @@
 
         <!-- 扁平按钮 -->
         <Style Selector="Button.flat">
-            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Background" Value="#2A2C44"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="14,8"/>
             <Setter Property="FontSize" Value="13"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
         <Style Selector="Button.flat:pointerover">
-            <Setter Property="Background" Value="#F0F1F8"/>
+            <Setter Property="Background" Value="#36395A"/>
         </Style>
 
-        <!-- 危险按钮 -->
         <Style Selector="Button.danger">
-            <Setter Property="Background" Value="#FF5252"/>
+            <Setter Property="Background" Value="#B3261E"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="14,8"/>
@@ -126,7 +119,7 @@
 
         <!-- 输入框 -->
         <Style Selector="TextBox">
-            <Setter Property="Background" Value="{StaticResource InputBgBrush}"/>
+            <Setter Property="Background" Value="{StaticResource BgInputBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -138,9 +131,8 @@
             <Setter Property="BorderBrush" Value="{StaticResource AccentPurpleBrush}"/>
         </Style>
 
-        <!-- 下拉框 -->
         <Style Selector="ComboBox">
-            <Setter Property="Background" Value="{StaticResource InputBgBrush}"/>
+            <Setter Property="Background" Value="{StaticResource BgInputBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
             <Setter Property="CornerRadius" Value="8"/>
@@ -160,14 +152,14 @@
             <Setter Property="FontSize" Value="13"/>
         </Style>
         <Style Selector="ListBoxItem:selected">
-            <Setter Property="Background" Value="#E0E2F5"/>
-            <Setter Property="Foreground" Value="{StaticResource AccentPurple}"/>
+            <Setter Property="Background" Value="#3D3F66"/>
+            <Setter Property="Foreground" Value="White"/>
         </Style>
         <Style Selector="ListBoxItem:pointerover">
-            <Setter Property="Background" Value="#EEF0FA"/>
+            <Setter Property="Background" Value="#2E3050"/>
         </Style>
 
-        <!-- 文字样式 -->
+        <!-- 文字 -->
         <Style Selector="TextBlock.section">
             <Setter Property="FontSize" Value="22"/>
             <Setter Property="FontWeight" Value="Bold"/>
@@ -195,25 +187,24 @@
         <Style Selector="ProgressBar">
             <Setter Property="Height" Value="8"/>
             <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Background" Value="#E0E2F0"/>
+            <Setter Property="Background" Value="#2E3050"/>
             <Setter Property="Foreground">
                 <Setter.Value>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                         <GradientStop Color="#7C4DFF" Offset="0"/>
-                        <GradientStop Color="#00B8D4" Offset="1"/>
+                        <GradientStop Color="#00E5FF" Offset="1"/>
                     </LinearGradientBrush>
                 </Setter.Value>
             </Setter>
         </Style>
 
-        <!-- 卡片：液态玻璃效果 -->
+        <!-- 卡片：实色深色 -->
         <Style Selector="Border.card">
-            <Setter Property="Background" Value="#FFFFFF55"/>
-            <Setter Property="CornerRadius" Value="20"/>
-            <Setter Property="Padding" Value="22"/>
-            <Setter Property="BorderBrush" Value="#FFFFFF88"/>
+            <Setter Property="Background" Value="{StaticResource BgCardBrush}"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BoxShadow" Value="0 8 32 0 #00000050"/>
         </Style>
     </Application.Styles>
 </Application>
