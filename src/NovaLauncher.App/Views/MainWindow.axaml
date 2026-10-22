@@ -9,101 +9,97 @@
         Width="1200" Height="780" MinWidth="1020" MinHeight="640"
         WindowStartupLocation="CenterScreen"
         Title="NovaLauncher · Minecraft 第三方启动器"
-        Background="#191C20">
+        Background="#1A1B26">
 
     <Window.Styles>
-        <Style Selector="Button.accent">
-            <Setter Property="Background" Value="#2F7CF6"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="CornerRadius" Value="6"/>
-            <Setter Property="Padding" Value="16,8"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-        </Style>
-        <Style Selector="Button.flat">
-            <Setter Property="Background" Value="#2A2F36"/>
-            <Setter Property="Foreground" Value="#E8EAED"/>
-            <Setter Property="CornerRadius" Value="6"/>
-            <Setter Property="Padding" Value="12,6"/>
-        </Style>
-        <Style Selector="Button.flat:hover">
-            <Setter Property="Background" Value="#3A414A"/>
-        </Style>
-        <Style Selector="Button.danger">
-            <Setter Property="Background" Value="#B3261E"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="CornerRadius" Value="6"/>
-            <Setter Property="Padding" Value="12,6"/>
-        </Style>
-        <Style Selector="TextBox, ComboBox">
-            <Setter Property="Background" Value="#22262C"/>
-            <Setter Property="Foreground" Value="#E8EAED"/>
-            <Setter Property="BorderBrush" Value="#3A414A"/>
-            <Setter Property="CornerRadius" Value="5"/>
-        </Style>
-        <Style Selector="ListBox">
+        <!-- 导航项自定义样式 -->
+        <Style Selector="ListBoxItem.navitem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="6,2"/>
+            <Setter Property="CornerRadius" Value="10"/>
             <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         </Style>
-        <Style Selector="ListBoxItem">
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="CornerRadius" Value="5"/>
+        <Style Selector="ListBoxItem.navitem:selected">
+            <Setter Property="Background" Value="#2E3058"/>
         </Style>
-        <Style Selector="ListBoxItem:selected">
-            <Setter Property="Background" Value="#2F7CF6"/>
-            <Setter Property="Foreground" Value="White"/>
+        <Style Selector="ListBoxItem.navitem:pointerover">
+            <Setter Property="Background" Value="#252742"/>
         </Style>
-        <Style Selector="ListBoxItem:pointerover">
-            <Setter Property="Background" Value="#31373F"/>
-        </Style>
-        <Style Selector="TextBlock.section">
-            <Setter Property="FontSize" Value="20"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
-        </Style>
-        <Style Selector="TextBlock.label">
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="Foreground" Value="#9AA4B0"/>
-        </Style>
-        <Style Selector="TextBlock.status">
-            <Setter Property="Foreground" Value="#7CD4A8"/>
+        <Style Selector="ListBoxItem.navitem:selected /template/ ContentPresenter">
+            <Setter Property="TextBlock.Foreground" Value="White"/>
         </Style>
     </Window.Styles>
 
     <DockPanel>
-        <!-- 左侧导航 -->
-        <Border DockPanel.Dock="Left" Width="210" Background="#14171B">
+        <!-- 左侧导航栏 -->
+        <Border DockPanel.Dock="Left" Width="210" Background="#13131C">
             <DockPanel>
-                <StackPanel DockPanel.Dock="Top" Margin="18,22,18,10">
-                    <TextBlock Text="NovaLauncher" FontSize="19" FontWeight="Bold" Foreground="#FFFFFF"/>
-                    <TextBlock Text="Minecraft 启动器" FontSize="11" Foreground="#9AA4B0" Margin="2,2,0,18"/>
-                </StackPanel>
-                <StackPanel DockPanel.Dock="Bottom" Margin="16,0,16,16">
-                    <TextBlock Text="跨平台 · C# / Avalonia" FontSize="10" Foreground="#5C6570" TextWrapping="Wrap"/>
-                </StackPanel>
-                <ItemsControl ItemsSource="{Binding Pages}" Margin="10,0">
-                    <ItemsControl.ItemTemplate>
+                <!-- Logo 区域 -->
+                <Border DockPanel.Dock="Top" Padding="20,24,20,18" Background="#101018">
+                    <StackPanel Spacing="2">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="38" Height="38" CornerRadius="14" Background="#7C4DFF" VerticalAlignment="Center">
+                                <TextBlock Text="🎮" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="NovaLauncher" FontSize="17" FontWeight="Bold" Foreground="#E8EAF6"/>
+                                <TextBlock Text="Minecraft 启动器" FontSize="10" Foreground="#5C6080"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- 底部信息 -->
+                <Border DockPanel.Dock="Bottom" Padding="16,12">
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="v1.0.0" FontSize="10" Foreground="#5C6080"/>
+                        <TextBlock Text="跨平台 · C# / Avalonia" FontSize="9" Foreground="#3D4060"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 导航列表 -->
+                <ListBox ItemsSource="{Binding Pages}"
+                         SelectedItem="{Binding SelectedNav}"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Margin="8,12,8,8"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemContainerTheme>
+                        <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0,2"/>
+                            <Setter Property="CornerRadius" Value="10"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </ControlTheme>
+                    </ListBox.ItemContainerTheme>
+                    <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:NavItem">
-                            <Button Content="{Binding Title}"
-                                    Command="{Binding $parent[Window].DataContext.NavigateCommand}"
-                                    CommandParameter="{Binding}"
-                                    Background="Transparent" Foreground="#C9D1D9"
-                                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                    Padding="16,11" Margin="0,3" CornerRadius="6"
-                                    FontSize="14">
-                                <Button.Styles>
-                                    <Style Selector="Button:pointerover">
-                                        <Setter Property="Background" Value="#23282F"/>
-                                    </Style>
-                                </Button.Styles>
-                            </Button>
+                            <Grid ColumnDefinitions="4,40,*" Height="44">
+                                <!-- 选中高亮条 -->
+                                <Border Grid.Column="0" Width="3" CornerRadius="2" VerticalAlignment="Stretch"
+                                        Background="#7C4DFF" Margin="0,8,0,8"
+                                        IsVisible="{Binding $parent[ListBoxItem].IsSelected}"/>
+                                <!-- 图标 -->
+                                <Border Grid.Column="1" Width="32" Height="32" CornerRadius="10"
+                                        Background="#1E1F30" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Icon}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <!-- 文字 -->
+                                <TextBlock Grid.Column="2" Text="{Binding Title}" FontSize="14"
+                                           VerticalAlignment="Center" Margin="6,0,0,0"
+                                           Foreground="#C5CAE9"/>
+                            </Grid>
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </DockPanel>
         </Border>
 
-        <!-- 右侧内容 -->
-        <Border Background="#191C20" Padding="26,24">
-            <ContentControl Content="{Binding CurrentPage}"/>
+        <!-- 右侧内容区 -->
+        <Border Background="#1A1B26">
+            <ContentControl Content="{Binding CurrentPage}" Margin="0"/>
         </Border>
     </DockPanel>
 </Window>

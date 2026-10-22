@@ -7,8 +7,9 @@ namespace NovaLauncher.App.ViewModels;
 public sealed class NavItem
 {
     public string Title { get; }
+    public string Icon { get; }
     public ViewModelBase ViewModel { get; }
-    public NavItem(string title, ViewModelBase vm) { Title = title; ViewModel = vm; }
+    public NavItem(string title, string icon, ViewModelBase vm) { Title = title; Icon = icon; ViewModel = vm; }
 }
 
 public partial class MainViewModel : ViewModelBase
@@ -18,25 +19,28 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private ViewModelBase currentPage;
 
+    [ObservableProperty]
+    private NavItem selectedNav;
+
     public MainViewModel()
     {
         Pages = new List<NavItem>
         {
-            new("主页", new HomeViewModel()),
-            new("版本管理", new VersionsViewModel()),
-            new("模组管理", new ModsViewModel()),
-            new("模组下载", new ModDownloadViewModel()),
-            new("联机", new LanPlayViewModel()),
-            new("服务器", new ServersViewModel()),
-            new("设置", new SettingsViewModel()),
+            new("主页", "🏠", new HomeViewModel()),
+            new("版本管理", "📦", new VersionsViewModel()),
+            new("模组管理", "🧩", new ModsViewModel()),
+            new("模组下载", "⬇️", new ModDownloadViewModel()),
+            new("联机", "🔗", new LanPlayViewModel()),
+            new("服务器", "🖥️", new ServersViewModel()),
+            new("设置", "⚙️", new SettingsViewModel()),
         };
+        SelectedNav = Pages[0];
         CurrentPage = Pages[0].ViewModel;
     }
 
-    [RelayCommand]
-    private void Navigate(object? param)
+    partial void OnSelectedNavChanged(NavItem value)
     {
-        if (param is NavItem item)
-            CurrentPage = item.ViewModel;
+        if (value != null)
+            CurrentPage = value.ViewModel;
     }
 }

@@ -8,7 +8,7 @@
         <TextBlock Text="{Binding Status}" Classes="status" TextWrapping="Wrap"/>
 
         <!-- 搜索区 -->
-        <Border Background="#20242A" CornerRadius="10" Padding="16">
+        <Border Background="#222336" CornerRadius="14" Padding="16">
             <StackPanel Spacing="10">
                 <Grid ColumnDefinitions="Auto,130,140,*,Auto" ColumnSpacing="8">
                     <ComboBox Grid.Column="0" Width="110" ItemsSource="{Binding Sources}" SelectedIndex="{Binding SourceIndex}"/>
@@ -29,7 +29,7 @@
         <!-- 结果区 -->
         <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
             <!-- 模组列表 -->
-            <Border Background="#20242A" CornerRadius="10" Padding="12">
+            <Border Background="#222336" CornerRadius="14" Padding="12">
                 <StackPanel Spacing="8">
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock Text="搜索结果" Classes="label" VerticalAlignment="Center"/>
@@ -54,7 +54,7 @@
             </Border>
 
             <!-- 版本列表 -->
-            <Border Background="#20242A" CornerRadius="10" Padding="12">
+            <Border Background="#222336" CornerRadius="14" Padding="12">
                 <StackPanel Spacing="8">
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock Text="可用版本（选中后下载）" Classes="label" VerticalAlignment="Center"/>
@@ -92,7 +92,7 @@
         </Grid>
 
         <!-- 进度 -->
-        <Border IsVisible="{Binding ShowProgress}" Background="#20242A" CornerRadius="10" Padding="14">
+        <Border IsVisible="{Binding ShowProgress}" Background="#222336" CornerRadius="14" Padding="14">
             <StackPanel Spacing="8">
                 <ProgressBar Minimum="0" Maximum="100" Value="{Binding ProgressValue}" Height="10"/>
                 <TextBlock Text="正在下载模组文件…" Classes="status" FontSize="11"/>

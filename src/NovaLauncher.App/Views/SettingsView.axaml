@@ -8,7 +8,7 @@
             <TextBlock Text="设置" Classes="section"/>
             <TextBlock Text="{Binding Status}" Classes="status"/>
 
-            <Border Background="#20242A" CornerRadius="10" Padding="18">
+            <Border Background="#222336" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="14">
                     <TextBlock Text="路径与运行时" Classes="label"/>
 
@@ -30,7 +30,7 @@
                 </StackPanel>
             </Border>
 
-            <Border Background="#20242A" CornerRadius="10" Padding="18">
+            <Border Background="#222336" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="14">
                     <TextBlock Text="游戏性能" Classes="label"/>
                     <Grid ColumnDefinitions="150,*,150,*" ColumnSpacing="10" RowDefinitions="Auto,Auto">
@@ -53,7 +53,7 @@
                 </StackPanel>
             </Border>
 
-            <Border Background="#20242A" CornerRadius="10" Padding="18">
+            <Border Background="#222336" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="10">
                     <TextBlock Text="微软登录（可选）" Classes="label"/>
                     <TextBlock Text="在 Azure 门户注册桌面应用，填入其 ClientId 即可启用正版微软账号登录（Device Code 流程）。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
@@ -61,7 +61,7 @@
                 </StackPanel>
             </Border>
 
-            <Border Background="#20242A" CornerRadius="10" Padding="18">
+            <Border Background="#222336" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="10">
                     <TextBlock Text="模组下载数据源（可选）" Classes="label"/>
                     <TextBlock Text="Modrinth 源免费无需 Key；填入 CurseForge API Key 后可在模组下载中使用 CurseForge 源（需在 https://console.curseforge.com 申请）。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
