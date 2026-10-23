@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using NovaLauncher.Core.Services;
 
 namespace NovaLauncher.App.ViewModels;
 
@@ -22,6 +23,12 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private NavItem selectedNav;
 
+    // 更新提示
+    [ObservableProperty] private bool showUpdateBanner;
+    [ObservableProperty] private string updateBannerText = "";
+
+    public string CurrentVersionText => $"v{AppVersion.Current}";
+
     public MainViewModel()
     {
         Pages = new List<NavItem>
@@ -39,7 +46,26 @@ public partial class MainViewModel : ViewModelBase
         };
         SelectedNav = Pages[0];
         CurrentPage = Pages[0].ViewModel;
+
+        // 启动后静默检查更新
+        _ = CheckUpdateSilentlyAsync();
     }
+
+    private async Task CheckUpdateSilentlyAsync()
+    {
+        try
+        {
+            var info = await AppServices.Updates.CheckAsync();
+            if (info == null) return;
+            if (info.IsCurrent) return;
+            ShowUpdateBanner = true;
+            UpdateBannerText = $"发现新版本 v{info.Version}（当前 v{AppVersion.Current}）。可到「设置」页下载更新。";
+        }
+        catch { }
+    }
+
+    [RelayCommand]
+    private void DismissUpdate() => ShowUpdateBanner = false;
 
     partial void OnSelectedNavChanged(NavItem value)
     {

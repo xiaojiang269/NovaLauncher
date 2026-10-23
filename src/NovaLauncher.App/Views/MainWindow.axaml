@@ -47,7 +47,7 @@
                 <!-- 底部信息 -->
                 <Border DockPanel.Dock="Bottom" Padding="16,12">
                     <StackPanel Spacing="2">
-                        <TextBlock Text="v1.3.0" FontSize="10" Foreground="#5C6080"/>
+                        <TextBlock Text="{Binding CurrentVersionText}" FontSize="10" Foreground="#5C6080"/>
                         <TextBlock Text="跨平台 · C# / Avalonia" FontSize="9" Foreground="#3D4060"/>
                     </StackPanel>
                 </Border>
@@ -90,7 +90,20 @@
 
         <!-- 右侧内容区 -->
         <Border Background="#1A1B26">
-            <ContentControl Content="{Binding CurrentPage}" Margin="0"/>
+            <DockPanel>
+                <!-- 更新提示条 -->
+                <Border DockPanel.Dock="Top" Background="#2E3058" CornerRadius="0" Padding="16,10"
+                        IsVisible="{Binding ShowUpdateBanner}">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                            <TextBlock Text="🔄" FontSize="16"/>
+                            <TextBlock Text="{Binding UpdateBannerText}" Foreground="#E8EAF6" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="✕" Classes="flat" Command="{Binding DismissUpdateCommand}"/>
+                    </Grid>
+                </Border>
+                <ContentControl Content="{Binding CurrentPage}" Margin="0"/>
+            </DockPanel>
         </Border>
     </DockPanel>
 </Window>
