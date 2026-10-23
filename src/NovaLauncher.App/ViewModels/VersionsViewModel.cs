@@ -44,6 +44,14 @@ public partial class VersionsViewModel : ViewModelBase
     public ObservableCollection<string> NeoForgeVersions { get; } = new();
     [ObservableProperty] private string? selectedNeoForgeVersion;
 
+    // 版本迁移
+    [ObservableProperty] private string? migrateSourceVersion;
+    [ObservableProperty] private string? migrateTargetVersion;
+    [ObservableProperty] private bool migrateMods = true;
+    [ObservableProperty] private bool migrateResourcePacks = true;
+    [ObservableProperty] private bool migrateShaders = true;
+    [ObservableProperty] private string migrateSummary = "";
+
     // 状态
     [ObservableProperty] private string status = "就绪";
     [ObservableProperty] private bool isBusy;
@@ -331,5 +339,84 @@ public partial class VersionsViewModel : ViewModelBase
         }
         catch (Exception ex) { Status = "NeoForge 安装失败：" + ex.Message; }
         finally { IsBusy = false; }
+    }
+
+    // ---------- 版本迁移 ----------
+
+    /// <summary>把源版本的内容（模组/资源包/光影）迁移到目标版本。用于把旧实例配置搬到新隔离实例。</summary>
+    [RelayCommand]
+    private async Task MigrateAsync()
+    {
+        if (string.IsNullOrEmpty(MigrateSourceVersion) || string.IsNullOrEmpty(MigrateTargetVersion))
+        {
+            Status = "请先选择源版本和目标版本";
+            return;
+        }
+        if (string.Equals(MigrateSourceVersion, MigrateTargetVersion, StringComparison.Ordinal))
+        {
+            Status = "源版本与目标版本相同，无需迁移";
+            return;
+        }
+        if (!Directory.Exists(AppServices.Dir.VersionDir(MigrateSourceVersion)))
+        {
+            Status = "源版本目录不存在：请确认已安装 " + MigrateSourceVersion;
+            return;
+        }
+        // 目标版本需已存在目录
+        Directory.CreateDirectory(AppServices.Dir.VersionDir(MigrateTargetVersion));
+
+        IsBusy = true;
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"迁移：{MigrateSourceVersion} → {MigrateTargetVersion}");
+        var total = 0;
+        try
+        {
+            if (MigrateMods)
+            {
+                var n = CopyDirContents("mods", MigrateSourceVersion, MigrateTargetVersion);
+                total += n;
+                sb.AppendLine($"模组：迁移 {n} 个文件");
+            }
+            if (MigrateResourcePacks)
+            {
+                var n = CopyDirContents("resourcepacks", MigrateSourceVersion, MigrateTargetVersion);
+                total += n;
+                sb.AppendLine($"资源包：迁移 {n} 个文件");
+            }
+            if (MigrateShaders)
+            {
+                var n = CopyDirContents("shaderpacks", MigrateSourceVersion, MigrateTargetVersion);
+                total += n;
+                sb.AppendLine($"光影：迁移 {n} 个文件");
+            }
+            sb.AppendLine($"共迁移 {total} 个文件。");
+            MigrateSummary = sb.ToString();
+            Status = $"迁移完成：{MigrateSourceVersion} → {MigrateTargetVersion}，共 {total} 个文件。";
+        }
+        catch (Exception ex)
+        {
+            Status = "迁移失败：" + ex.Message;
+            MigrateSummary = sb + "\n错误：" + ex.Message;
+        }
+        finally { IsBusy = false; }
+    }
+
+    /// <summary>把源版本某子目录的文件复制到目标版本同名子目录（跳过同名已存在）。返回复制数。</summary>
+    private int CopyDirContents(string sub, string srcVersion, string dstVersion)
+    {
+        var src = AppServices.Dir.VersionSubDir(srcVersion, sub);
+        var dst = AppServices.Dir.VersionSubDir(dstVersion, sub);
+        if (!Directory.Exists(src)) return 0;
+        Directory.CreateDirectory(dst);
+        int n = 0;
+        foreach (var f in Directory.GetFiles(src))
+        {
+            var name = Path.GetFileName(f);
+            var target = Path.Combine(dst, name);
+            if (File.Exists(target)) continue;
+            File.Copy(f, target);
+            n++;
+        }
+        return n;
     }
 }

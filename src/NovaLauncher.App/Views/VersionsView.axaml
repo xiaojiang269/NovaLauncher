@@ -33,6 +33,33 @@
                 </StackPanel>
             </Border>
 
+            <!-- 版本迁移 -->
+            <Border Background="#222336" CornerRadius="14" Padding="18">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="版本迁移（搬到新隔离实例）" Classes="label"/>
+                    <TextBlock Text="把源版本的内容复制到目标版本。适用于：为新版本开启隔离后，把旧实例的模组/资源包/光影迁移过去。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                    <Grid ColumnDefinitions="*,Auto,*,Auto" ColumnSpacing="8">
+                        <TextBlock Grid.Column="0" Text="源版本" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding LocalVersions}"
+                                  SelectedItem="{Binding MigrateSourceVersion}" MinWidth="180"/>
+                        <TextBlock Grid.Column="2" Text="目标版本" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                        <ComboBox Grid.Column="3" ItemsSource="{Binding LocalVersions}"
+                                  SelectedItem="{Binding MigrateTargetVersion}" MinWidth="180"/>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Spacing="16">
+                        <CheckBox Content="模组" IsChecked="{Binding MigrateMods}"/>
+                        <CheckBox Content="资源包" IsChecked="{Binding MigrateResourcePacks}"/>
+                        <CheckBox Content="光影" IsChecked="{Binding MigrateShaders}"/>
+                    </StackPanel>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <TextBlock Grid.Column="0" Text="{Binding MigrateSummary}" Classes="label" FontSize="11"
+                                   TextWrapping="Wrap" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="执行迁移" Classes="accent"
+                                Command="{Binding MigrateCommand}" IsEnabled="{Binding !IsBusy}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
             <!-- 官方版本下载 -->
             <Border Background="#222336" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="12">
