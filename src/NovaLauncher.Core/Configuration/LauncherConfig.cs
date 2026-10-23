@@ -62,6 +62,9 @@ public sealed class LauncherConfig
     /// <summary>CurseForge API key（可选，填入后模组下载可用 CurseForge 源）。</summary>
     public string CurseForgeApiKey { get; set; } = "";
 
+    /// <summary>版本隔离：开启后每个版本使用独立游戏目录（versions/{id}/），存档/配置/资源包与其他版本隔离。</summary>
+    public bool VersionIsolation { get; set; }
+
     public static LauncherConfig CreateDefault(string gameDir)
     {
         return new LauncherConfig

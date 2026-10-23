@@ -18,6 +18,7 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private string extraJvmArgs;
     [ObservableProperty] private string microsoftClientId;
     [ObservableProperty] private string curseForgeApiKey;
+    [ObservableProperty] private bool versionIsolation;
     [ObservableProperty] private string status = "";
 
     public ObservableCollection<string> DownloadMirrors { get; } = new() { "官方海外源", "大陆源（已关闭）" };
@@ -47,6 +48,7 @@ public partial class SettingsViewModel : ViewModelBase
         MicrosoftClientId = c.MicrosoftClientId;
         CurseForgeApiKey = c.CurseForgeApiKey;
         DownloadMirror = c.DownloadMirror;
+        VersionIsolation = c.VersionIsolation;
     }
 
     [RelayCommand]
@@ -63,6 +65,7 @@ public partial class SettingsViewModel : ViewModelBase
         c.ExtraJvmArgs = ExtraJvmArgs;
         c.MicrosoftClientId = MicrosoftClientId.Trim();
         c.CurseForgeApiKey = CurseForgeApiKey.Trim();
+        c.VersionIsolation = VersionIsolation;
         // 大陆下载源已按法律合规关闭，始终使用官方海外源
         c.DownloadMirror = 0;
         AppServices.SaveConfig();

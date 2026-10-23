@@ -27,6 +27,7 @@
                         <ComboBox Grid.Column="1" ItemsSource="{Binding DownloadMirrors}" SelectedIndex="{Binding DownloadMirror}"/>
                         <TextBlock Grid.Column="2" Text="国内建议 BMCLAPI" Classes="label" VerticalAlignment="Center" Margin="6,0,0,0"/>
                     </Grid>
+                    <CheckBox Content="版本隔离（每个版本使用独立存档与配置目录，适合多版本共存）" IsChecked="{Binding VersionIsolation}"/>
                 </StackPanel>
             </Border>
 

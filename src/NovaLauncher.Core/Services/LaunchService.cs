@@ -9,8 +9,25 @@ namespace NovaLauncher.Core.Services;
 public sealed class LaunchService
 {
     private readonly GameDir _dir;
+    private readonly LauncherConfig _config;
 
-    public LaunchService(LauncherConfig config) => _dir = new GameDir(config);
+    public LaunchService(LauncherConfig config)
+    {
+        _config = config;
+        _dir = new GameDir(config);
+    }
+
+    /// <summary>该版本实际使用的游戏数据目录（版本隔离开启时用 versions/{id}/，否则用根目录）。</summary>
+    public string GameDataDir(string versionId)
+    {
+        if (_config.VersionIsolation)
+        {
+            var d = _dir.VersionDir(versionId);
+            Directory.CreateDirectory(d);
+            return d;
+        }
+        return _dir.Root;
+    }
 
     /// <summary>启动游戏。</summary>
     public LaunchResult Launch(MinecraftVersion version, LaunchOptions options, JavaInfo java, IProgress<string>? log = null)
@@ -20,6 +37,8 @@ public sealed class LaunchService
         var nativeDir = _dir.NativesDir(version.Id);
         // 1.20+ 版本已移除 natives 机制，目录可能为空；统一确保存在即可
         Directory.CreateDirectory(nativeDir);
+
+        var gameDir = GameDataDir(version.Id);
 
         // 1. 组装 classpath
         var classpath = new List<string> { _dir.VersionJar(version.Id) };
@@ -37,7 +56,7 @@ public sealed class LaunchService
         jvm.Add($"-Xmx{options.MaxMemoryMb}M");
         jvm.Add($"-Xms{options.MinMemoryMb}M");
 
-        var dict = BuildTokenMap(version.Id, options, nativeDir, cp);
+        var dict = BuildTokenMap(version.Id, options, nativeDir, cp, gameDir);
         foreach (var arg in version.JvmArguments)
         {
             if (!arg.Allowed) continue;
@@ -88,7 +107,7 @@ public sealed class LaunchService
         var psi = new ProcessStartInfo
         {
             FileName = java.Path,
-            WorkingDirectory = _dir.Root,
+            WorkingDirectory = gameDir,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -136,7 +155,7 @@ public sealed class LaunchService
         }
     }
 
-    private Dictionary<string, string> BuildTokenMap(string versionId, LaunchOptions options, string nativeDir, string cp)
+    private Dictionary<string, string> BuildTokenMap(string versionId, LaunchOptions options, string nativeDir, string cp, string gameDir)
     {
         var account = options.Account;
         var assetsRoot = _dir.Assets;
@@ -145,7 +164,7 @@ public sealed class LaunchService
         {
             ["${auth_player_name}"] = account.Name,
             ["${version_name}"] = versionId,
-            ["${game_directory}"] = _dir.Root,
+            ["${game_directory}"] = gameDir,
             ["${game_assets}"] = assetsRoot,
             ["${assets_root}"] = assetsRoot,
             ["${assets_index_name}"] = assetsIndex,
