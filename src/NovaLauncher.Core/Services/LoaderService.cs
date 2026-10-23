@@ -86,4 +86,64 @@ public sealed class LoaderService
         p.WaitForExit();
         return p.ExitCode == 0;
     }
+
+    // ---------- Quilt ----------
+
+    /// <summary>获取某游戏版本可用的 Quilt Loader 版本列表。</summary>
+    public async Task<List<string>> GetQuiltLoadersAsync(string mcVersion, CancellationToken ct = default)
+    {
+        var url = DownloadMirror.Rewrite($"https://meta.quiltmc.org/v3/versions/loader/{mcVersion}", _mirror);
+        var json = await Http.GetStringAsync(url, ct).ConfigureAwait(false);
+        var arr = Newtonsoft.Json.Linq.JArray.Parse(json);
+        return arr.Select(x => x["loader"]?["version"]?.ToString() ?? "").Where(v => !string.IsNullOrEmpty(v)).ToList();
+    }
+
+    /// <summary>安装 Quilt：获取 profile json 并保存为版本。返回版本 id。</summary>
+    public async Task<string> InstallQuiltAsync(string mcVersion, string loaderVersion, IProgress<string>? log, CancellationToken ct = default)
+    {
+        var url = DownloadMirror.Rewrite(
+            $"https://meta.quiltmc.org/v3/versions/loader/{mcVersion}/{loaderVersion}/profile/json", _mirror);
+        log?.Report($"获取 Quilt {loaderVersion} 版本信息…");
+        var json = await Http.GetStringAsync(url, ct).ConfigureAwait(false);
+        var root = Newtonsoft.Json.Linq.JObject.Parse(json);
+        var id = root["id"]?.ToString() ?? $"quilt-loader-{loaderVersion}-{mcVersion}";
+        var dir = _dir.VersionDir(id);
+        Directory.CreateDirectory(dir);
+        File.WriteAllText(_dir.VersionJson(id), json);
+        return id;
+    }
+
+    // ---------- NeoForge ----------
+
+    /// <summary>获取某游戏版本可用的 NeoForge 版本列表（maven 索引）。</summary>
+    public async Task<List<string>> GetNeoForgeVersionsAsync(string mcVersion, CancellationToken ct = default)
+    {
+        var url = DownloadMirror.Rewrite(
+            $"https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml", _mirror);
+        var xml = await Http.GetStringAsync(url, ct).ConfigureAwait(false);
+        var doc = System.Xml.Linq.XDocument.Parse(xml);
+        var versions = doc.Descendants("version")
+            .Select(v => v.Value)
+            .Where(v => v.StartsWith(mcVersion + "-", StringComparison.Ordinal))
+            .ToList();
+        return versions;
+    }
+
+    /// <summary>下载 NeoForge installer jar。返回本地路径。</summary>
+    public async Task<string> DownloadNeoForgeInstallerAsync(string mcVersion, string neoVersion, IProgress<string>? log, CancellationToken ct = default)
+    {
+        var destDir = Path.Combine(_dir.Modpacks, "neoforge");
+        Directory.CreateDirectory(destDir);
+        var dest = Path.Combine(destDir, $"neoforge-{mcVersion}-{neoVersion}-installer.jar");
+        var url = DownloadMirror.Rewrite(
+            $"https://maven.neoforged.net/releases/net/neoforged/neoforge/{neoVersion}/neoforge-{neoVersion}-installer.jar",
+            _mirror);
+        log?.Report($"下载 NeoForge Installer {neoVersion}…");
+        await Http.DownloadAsync(url, dest, null, ct).ConfigureAwait(false);
+        return dest;
+    }
+
+    /// <summary>运行 installer 安装到客户端。neoforge 参数同 Forge。返回是否成功。</summary>
+    public bool RunInstallerClient(string installerPath, string javaExe, IProgress<string>? log)
+        => RunForgeInstaller(installerPath, javaExe, log);
 }

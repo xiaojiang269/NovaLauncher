@@ -34,6 +34,16 @@ public partial class VersionsViewModel : ViewModelBase
     [ObservableProperty] private string forgeMcVersion = "1.20.1";
     [ObservableProperty] private string forgeVersion = "";
 
+    // Quilt
+    [ObservableProperty] private string quiltMcVersion = "1.20.1";
+    public ObservableCollection<string> QuiltLoaders { get; } = new();
+    [ObservableProperty] private string? selectedQuiltLoader;
+
+    // NeoForge
+    [ObservableProperty] private string neoForgeMcVersion = "1.20.1";
+    public ObservableCollection<string> NeoForgeVersions { get; } = new();
+    [ObservableProperty] private string? selectedNeoForgeVersion;
+
     // 状态
     [ObservableProperty] private string status = "就绪";
     [ObservableProperty] private bool isBusy;
@@ -238,5 +248,88 @@ public partial class VersionsViewModel : ViewModelBase
         Directory.Delete(dir, true);
         RefreshLocal();
         Status = $"已删除版本 {id}";
+    }
+
+    // ---------- Quilt ----------
+
+    [RelayCommand]
+    private async Task LoadQuiltLoadersAsync()
+    {
+        if (string.IsNullOrWhiteSpace(QuiltMcVersion)) { Status = "请输入 Quilt 对应的游戏版本"; return; }
+        IsBusy = true;
+        QuiltLoaders.Clear();
+        try
+        {
+            var loaders = await _loaders.GetQuiltLoadersAsync(QuiltMcVersion.Trim());
+            foreach (var l in loaders) QuiltLoaders.Add(l);
+            SelectedQuiltLoader = QuiltLoaders.FirstOrDefault();
+            Status = loaders.Count > 0 ? $"找到 {loaders.Count} 个 Quilt Loader 版本" : "该游戏版本暂无 Quilt Loader";
+        }
+        catch (Exception ex) { Status = "获取 Quilt Loader 失败：" + ex.Message; }
+        finally { IsBusy = false; }
+    }
+
+    [RelayCommand]
+    private async Task InstallQuiltAsync()
+    {
+        if (string.IsNullOrWhiteSpace(QuiltMcVersion) || string.IsNullOrEmpty(SelectedQuiltLoader))
+        {
+            Status = "请先选择游戏版本并加载 Quilt Loader 列表";
+            return;
+        }
+        IsBusy = true;
+        try
+        {
+            Status = "安装 Quilt…";
+            var id = await _loaders.InstallQuiltAsync(QuiltMcVersion.Trim(), SelectedQuiltLoader, null);
+            RefreshLocal();
+            Status = $"Quilt 版本 {id} 已安装。";
+        }
+        catch (Exception ex) { Status = "Quilt 安装失败：" + ex.Message; }
+        finally { IsBusy = false; }
+    }
+
+    // ---------- NeoForge ----------
+
+    [RelayCommand]
+    private async Task LoadNeoForgeVersionsAsync()
+    {
+        if (string.IsNullOrWhiteSpace(NeoForgeMcVersion)) { Status = "请输入 NeoForge 对应的游戏版本"; return; }
+        IsBusy = true;
+        NeoForgeVersions.Clear();
+        try
+        {
+            var versions = await _loaders.GetNeoForgeVersionsAsync(NeoForgeMcVersion.Trim());
+            foreach (var v in versions) NeoForgeVersions.Add(v);
+            SelectedNeoForgeVersion = NeoForgeVersions.FirstOrDefault();
+            Status = versions.Count > 0 ? $"找到 {versions.Count} 个 NeoForge 版本" : "该游戏版本暂无 NeoForge";
+        }
+        catch (Exception ex) { Status = "获取 NeoForge 版本失败：" + ex.Message; }
+        finally { IsBusy = false; }
+    }
+
+    [RelayCommand]
+    private async Task InstallNeoForgeAsync()
+    {
+        if (string.IsNullOrWhiteSpace(NeoForgeMcVersion) || string.IsNullOrEmpty(SelectedNeoForgeVersion))
+        {
+            Status = "请先选择游戏版本和 NeoForge 版本";
+            return;
+        }
+        IsBusy = true;
+        try
+        {
+            Status = "下载 NeoForge 安装器…";
+            var installer = await _loaders.DownloadNeoForgeInstallerAsync(NeoForgeMcVersion.Trim(), SelectedNeoForgeVersion, null);
+            var java = JavaService.Probe(AppServices.Config.JavaPath) ??
+                       JavaService.FindSystemJava().OrderByDescending(j => j.MajorVersion).FirstOrDefault();
+            if (java == null) { Status = "未找到 Java，无法运行 NeoForge 安装器"; return; }
+            Status = "运行 NeoForge 安装器（请耐心等待）…";
+            var ok = _loaders.RunInstallerClient(installer, java.Path, new Progress<string>(s => Status = s));
+            if (ok) { RefreshLocal(); Status = "NeoForge 安装完成。"; }
+            else Status = "NeoForge 安装失败，请查看上方日志。";
+        }
+        catch (Exception ex) { Status = "NeoForge 安装失败：" + ex.Message; }
+        finally { IsBusy = false; }
     }
 }

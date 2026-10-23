@@ -92,6 +92,36 @@
                             <TextBlock Text="Forge 通过官方 Installer 安装，需要本机已安装对应 Java 版本，安装过程较慢。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
                         </StackPanel>
                     </Border>
+
+                    <!-- Quilt -->
+                    <Border Background="#1C1D2E" CornerRadius="10" Padding="14">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Quilt" FontWeight="Bold"/>
+                            <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
+                                <TextBox Grid.Column="0" Text="{Binding QuiltMcVersion}" PlaceholderText="游戏版本，如 1.20.1"/>
+                                <Button Grid.Column="1" Content="加载 Loader" Classes="flat" Command="{Binding LoadQuiltLoadersCommand}"/>
+                                <Button Grid.Column="2" Content="安装" Classes="accent" Command="{Binding InstallQuiltCommand}"/>
+                            </Grid>
+                            <ComboBox ItemsSource="{Binding QuiltLoaders}" SelectedItem="{Binding SelectedQuiltLoader}"
+                                      PlaceholderText="选择 Quilt Loader 版本" HorizontalAlignment="Stretch"/>
+                            <TextBlock Text="Quilt 是 Fabric 的社区分支，安装方式类似 Fabric。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- NeoForge -->
+                    <Border Background="#1C1D2E" CornerRadius="10" Padding="14">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="NeoForge" FontWeight="Bold"/>
+                            <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
+                                <TextBox Grid.Column="0" Text="{Binding NeoForgeMcVersion}" PlaceholderText="游戏版本，如 1.20.1"/>
+                                <Button Grid.Column="1" Content="加载版本" Classes="flat" Command="{Binding LoadNeoForgeVersionsCommand}"/>
+                                <Button Grid.Column="2" Content="下载并安装" Classes="accent" Command="{Binding InstallNeoForgeCommand}"/>
+                            </Grid>
+                            <ComboBox ItemsSource="{Binding NeoForgeVersions}" SelectedItem="{Binding SelectedNeoForgeVersion}"
+                                      PlaceholderText="选择 NeoForge 版本" HorizontalAlignment="Stretch"/>
+                            <TextBlock Text="NeoForge 是 Forge 的延续，通过官方 Installer 安装。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </Border>
 
