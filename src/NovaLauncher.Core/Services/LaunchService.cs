@@ -56,7 +56,7 @@ public sealed class LaunchService
         jvm.Add($"-Xmx{options.MaxMemoryMb}M");
         jvm.Add($"-Xms{options.MinMemoryMb}M");
 
-        var dict = BuildTokenMap(version.Id, options, nativeDir, cp, gameDir);
+        var dict = BuildTokenMap(version, options, nativeDir, cp, gameDir);
         foreach (var arg in version.JvmArguments)
         {
             if (!arg.Allowed) continue;
@@ -155,11 +155,14 @@ public sealed class LaunchService
         }
     }
 
-    private Dictionary<string, string> BuildTokenMap(string versionId, LaunchOptions options, string nativeDir, string cp, string gameDir)
+    private Dictionary<string, string> BuildTokenMap(MinecraftVersion version, LaunchOptions options, string nativeDir, string cp, string gameDir)
     {
+        var versionId = version.Id;
         var account = options.Account;
         var assetsRoot = _dir.Assets;
-        var assetsIndex = versionId;
+        // 资源索引名：必须使用版本 json 的 assetIndex.id（如 "36"），否则游戏找不到索引导致资源缺失。
+        // 老版本没有 assetIndex 字段时回退到版本 ID。
+        var assetsIndex = !string.IsNullOrEmpty(version.AssetIndex?.Id) ? version.AssetIndex.Id : versionId;
         var map = new Dictionary<string, string>
         {
             ["${auth_player_name}"] = account.Name,
