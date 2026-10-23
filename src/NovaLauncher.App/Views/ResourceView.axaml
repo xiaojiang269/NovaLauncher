@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NovaLauncher.App.ViewModels"
+             x:Class="NovaLauncher.App.Views.ResourceView"
+             x:DataType="vm:ResourceViewModel">
+    <StackPanel Spacing="16" MaxWidth="860">
+        <TextBlock Text="资源包与光影" Classes="section"/>
+        <TextBlock Text="按版本管理资源包（resourcepacks）与光影包（shaderpacks）：导入 zip、启用/禁用、删除、打开文件夹。" Classes="status"/>
+        <TextBlock Text="{Binding Status}" Classes="status"/>
+
+        <Border Background="#222336" CornerRadius="14" Padding="18">
+            <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="160,*,Auto,Auto" ColumnSpacing="8">
+                    <TextBlock Text="选择版本" VerticalAlignment="Center" Classes="label"/>
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding Versions}"
+                              SelectedItem="{Binding SelectedVersion}"/>
+                    <Button Grid.Column="2" Content="刷新" Classes="flat" Command="{Binding RefreshCmdCommand}"/>
+                    <Button Grid.Column="3" Content="打开文件夹" Classes="flat" Command="{Binding OpenFolderCommand}"/>
+                </Grid>
+                <Grid ColumnDefinitions="160,*,Auto" ColumnSpacing="8">
+                    <TextBlock Text="类型" VerticalAlignment="Center" Classes="label"/>
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding KindOptions}" SelectedIndex="{Binding KindIndex}"/>
+                    <Button Grid.Column="2" Content="导入 zip" Classes="accent" Command="{Binding ImportCommand}" IsEnabled="{Binding !IsBusy}"/>
+                </Grid>
+
+                <ListBox ItemsSource="{Binding Packs}" SelectedItem="{Binding SelectedPack}" Height="300">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="70,*,Auto,Auto,Auto">
+                                <TextBlock Grid.Column="0" Text="启用" Foreground="#7CD4A8" VerticalAlignment="Center"
+                                           IsVisible="{Binding Enabled}"/>
+                                <TextBlock Grid.Column="0" Text="禁用" Foreground="#9AA4B0" VerticalAlignment="Center"
+                                           IsVisible="{Binding !Enabled}"/>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="{Binding DisplayName}"/>
+                                    <TextBlock Text="{Binding TypeText}" Classes="label" FontSize="11"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="2" Text="{Binding SizeText}" Classes="label" VerticalAlignment="Center" Margin="0,0,14,0"/>
+                                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6">
+                                    <Button Content="切换" Classes="flat"
+                                            Command="{Binding $parent[ListBox].DataContext.ToggleSelectedCommand}"/>
+                                    <Button Content="删除" Classes="danger"
+                                            Command="{Binding $parent[ListBox].DataContext.DeleteSelectedCommand}"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

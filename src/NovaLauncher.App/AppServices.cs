@@ -19,6 +19,7 @@ public static class AppServices
     public static LoaderService Loaders { get; private set; } = null!;
     public static SkinService Skins { get; private set; } = null!;
     public static WorldService Worlds { get; private set; } = null!;
+    public static ResourceService Resources { get; private set; } = null!;
 
     public static string MirrorName =>
         Config.DownloadMirror == 1 ? Core.Configuration.DownloadMirror.Bmclapi : Core.Configuration.DownloadMirror.Official;
@@ -49,6 +50,7 @@ public static class AppServices
         Loaders = new LoaderService(Config, mirror);
         Skins = new SkinService(Dir);
         Worlds = new WorldService(Config);
+        Resources = new ResourceService(Config);
     }
 
     public static void SaveConfig() => Config.Save();
