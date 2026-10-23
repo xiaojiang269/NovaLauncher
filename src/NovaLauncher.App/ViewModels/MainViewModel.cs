@@ -31,6 +31,7 @@ public partial class MainViewModel : ViewModelBase
             new("模组管理", "🧩", new ModsViewModel()),
             new("模组下载", "⬇️", new ModDownloadViewModel()),
             new("皮肤库", "🎨", new SkinViewModel()),
+            new("存档管理", "🗺️", new WorldViewModel()),
             new("联机", "🔗", new LanPlayViewModel()),
             new("服务器", "🖥️", new ServersViewModel()),
             new("设置", "⚙️", new SettingsViewModel()),

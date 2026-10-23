@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NovaLauncher.App.ViewModels"
+             x:Class="NovaLauncher.App.Views.WorldView"
+             x:DataType="vm:WorldViewModel">
+    <StackPanel Spacing="16" MaxWidth="860">
+        <TextBlock Text="存档管理" Classes="section"/>
+        <TextBlock Text="管理 Minecraft 存档（世界）：导入/导出 ZIP、备份与恢复、打开存档文件夹。存档存放于游戏目录 saves/ 下。" Classes="status"/>
+        <TextBlock Text="{Binding Status}" Classes="status"/>
+
+        <Border Background="#222336" CornerRadius="14" Padding="18">
+            <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <TextBlock Grid.Column="0" Text="本地存档列表" Classes="label" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <Button Content="刷新" Classes="flat" Command="{Binding RefreshCommand}"/>
+                        <Button Content="导入存档" Classes="accent" Command="{Binding ImportCommand}" IsEnabled="{Binding !IsBusy}"/>
+                    </StackPanel>
+                </Grid>
+
+                <ListBox ItemsSource="{Binding Worlds}" SelectedItem="{Binding SelectedWorld}" Height="280">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                <TextBlock Grid.Column="0" Text="🗺️" FontSize="20" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="{Binding Name}"/>
+                                    <TextBlock Text="{Binding FolderName}" Classes="label" FontSize="11"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding SizeText}" Classes="label" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding LastPlayed, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Classes="label" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6" Margin="14,0,0,0">
+                                    <Button Content="打开" Classes="flat"
+                                            Command="{Binding $parent[ListBox].DataContext.OpenSelectedCommand}"/>
+                                    <Button Content="导出" Classes="flat"
+                                            Command="{Binding $parent[ListBox].DataContext.ExportSelectedCommand}"/>
+                                    <Button Content="备份" Classes="flat"
+                                            Command="{Binding $parent[ListBox].DataContext.BackupCommand}"/>
+                                    <Button Content="删除" Classes="danger"
+                                            Command="{Binding $parent[ListBox].DataContext.DeleteSelectedCommand}"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </Border>
+
+        <Border Background="#222336" CornerRadius="14" Padding="18">
+            <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <TextBlock Grid.Column="0" Text="备份与恢复" Classes="label" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <Button Content="从备份恢复" Classes="accent" Command="{Binding RestoreCommand}" IsEnabled="{Binding !IsBusy}"/>
+                    </StackPanel>
+                </Grid>
+                <TextBlock Text="备份存放于 saves/backups/ 目录（自动命名：存档名_时间戳.zip）。选择一个备份即可恢复为可导入的存档。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                <ListBox ItemsSource="{Binding Backups}" SelectedItem="{Binding SelectedBackup}" Height="140">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>
