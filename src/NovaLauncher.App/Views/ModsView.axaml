@@ -18,6 +18,7 @@
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                     <TextBlock Grid.Column="0" Text="mods 目录中的文件（.jar 为模组，.zip 为资源包）" Classes="label" VerticalAlignment="Center"/>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <Button Content="识别校验" Classes="flat" Command="{Binding VerifySelectedCommand}"/>
                         <Button Content="切换版本" Classes="flat" Command="{Binding SwitchVersionCommand}"/>
                         <Button Content="一键提取" Classes="flat" Command="{Binding ExtractNestedCommand}"/>
                         <Button Content="依赖排序" Classes="flat" Command="{Binding SortDepsCommand}"/>
@@ -75,6 +76,17 @@
                 </ListBox>
                 <Button Content="下载替换" Classes="accent" HorizontalAlignment="Right"
                         Command="{Binding ApplyRemoteVersionCommand}" IsEnabled="{Binding !IsRemoteBusy}"/>
+            </StackPanel>
+        </Border>
+
+        <Border Background="#222336" CornerRadius="14" Padding="18" IsVisible="{Binding ShowVerifyPanel}">
+            <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <TextBlock Grid.Column="0" Text="模组识别校验" Classes="section" FontSize="14" VerticalAlignment="Center"/>
+                    <Button Grid.Column="1" Content="✕ 关闭" Classes="flat" Command="{Binding CloseVerifyPanelCommand}"/>
+                </Grid>
+                <TextBox Text="{Binding VerifySummary}" Classes="code" AcceptsReturn="True" MinHeight="160"
+                         IsReadOnly="True" TextWrapping="NoWrap" FontFamily="monospace" FontSize="12"/>
             </StackPanel>
         </Border>
 

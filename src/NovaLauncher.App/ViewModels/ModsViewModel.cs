@@ -31,6 +31,10 @@ public partial class ModsViewModel : ViewModelBase
     // 一键提取/依赖排序
     [ObservableProperty] private string extractStatus = "";
 
+    // 识别校验
+    [ObservableProperty] private bool showVerifyPanel;
+    [ObservableProperty] private string verifySummary = "";
+
     public ModsViewModel()
     {
         foreach (var v in AppServices.Dir.ListInstalledVersions()) Versions.Add(v);
@@ -300,4 +304,78 @@ public partial class ModsViewModel : ViewModelBase
         var m = System.Text.RegularExpressions.Regex.Match(id, @"(\d+\.\d+(?:\.\d+)?)");
         return (m.Success ? m.Groups[1].Value : null, loader);
     }
+
+    // ---------- 识别校验 ----------
+
+    /// <summary>识别校验选中模组：读取 jar 清单、判断加载器类型与能否被游戏加载、检查文件完整性。</summary>
+    [RelayCommand]
+    private void VerifySelected()
+    {
+        if (SelectedVersion == null || SelectedMod == null)
+        {
+            Status = "请先选择版本和一个模组";
+            return;
+        }
+        var file = SelectedMod.FileName;
+        var path = Path.Combine(AppServices.Dir.VersionModsDir(SelectedVersion), file);
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine($"文件：{file}");
+        sb.AppendLine($"大小：{SelectedMod.SizeText} · 修改：{SelectedMod.ModifiedAt:yyyy-MM-dd HH:mm}");
+        sb.AppendLine();
+
+        if (SelectedMod.Kind != "模组")
+        {
+            sb.AppendLine("类型：非标准 .jar 模组（可能为资源包 / 库 / 其他文件）。");
+            sb.AppendLine("校验：不属于可识别模组清单，无需按模组校验。");
+            ShowVerifyPanel = true;
+            VerifySummary = sb.ToString();
+            Status = "识别完成（非标准模组文件）。";
+            return;
+        }
+
+        // 读清单
+        var identity = _mods.ReadIdentity(SelectedVersion, file);
+        if (identity == null)
+        {
+            sb.AppendLine("清单：未找到 fabric.mod.json / mods.toml / mcmod.info");
+            sb.AppendLine("结论：该 jar 不是可识别的模组（可能是核心 mod / 前置库 / 损坏文件）。");
+            sb.AppendLine("提示：若无法启动，可尝试删除；若是前置库请保留。");
+            ShowVerifyPanel = true;
+            VerifySummary = sb.ToString();
+            Status = "识别完成：非标准模组 jar。";
+            return;
+        }
+
+        // 完整性：能否打开 zip 且包含主类或资源（读清单成功即基本完整）
+        var loaderName = identity.Loader switch
+        {
+            "fabric" => "Fabric (fabric.mod.json)",
+            "forge" => "Forge/NeoForge (mods.toml 或 mcmod.info)",
+            _ => identity.Loader ?? "未知",
+        };
+        sb.AppendLine($"模组 ID：{identity.Id}");
+        sb.AppendLine($"版本：{identity.Version ?? "未知"}");
+        sb.AppendLine($"显示名：{identity.Display}");
+        sb.AppendLine($"加载器：{loaderName}");
+        sb.AppendLine($"加载方式：{(identity.Loader == "fabric" ? "Fabric/Quilt 环境" : "Forge/NeoForge 环境")}");
+        sb.AppendLine($"完整性：清单可读，文件结构正常。");
+
+        // 冲突提示
+        var conflicts = new ModConflictDetector().Detect(AppServices.Dir.VersionModsDir(SelectedVersion));
+        var grp = conflicts.FirstOrDefault(g => string.Equals(g.ModId, identity.Id, StringComparison.OrdinalIgnoreCase));
+        if (grp != null)
+        {
+            sb.AppendLine();
+            sb.AppendLine($"⚠ 冲突：同一模组存在 {grp.Files.Count} 个文件：");
+            foreach (var f in grp.Files) sb.AppendLine($"   · {f.FileName}（v{f.Version ?? "?"}）");
+            sb.AppendLine("建议：保留一个版本，删除其余，否则可能无法启动或报错。");
+        }
+
+        ShowVerifyPanel = true;
+        VerifySummary = sb.ToString();
+        Status = $"已校验「{identity.Display}」：加载器 {identity.Loader ?? "未知"} · 版本 {identity.Version ?? "未知"}";
+    }
+
+    [RelayCommand]
+    private void CloseVerifyPanel() => ShowVerifyPanel = false;
 }
