@@ -157,4 +157,77 @@ public partial class SettingsViewModel : ViewModelBase
         await MainWindowRef.CopyToClipboardAsync(DiagReport);
         Status = "诊断报告已复制到剪贴板";
     }
+
+    // ---------- 自动更新 ----------
+
+    [ObservableProperty] private string updateStatus = $"当前版本 v{Core.Services.AppVersion.Current}";
+    [ObservableProperty] private bool isUpdateBusy;
+    [ObservableProperty] private bool showUpdateProgress;
+    [ObservableProperty] private double updateProgress;
+    [ObservableProperty] private string latestVersion = "";
+
+    /// <summary>检查更新：查询 GitHub 最新 Release。</summary>
+    [RelayCommand]
+    private async Task CheckUpdateAsync()
+    {
+        IsUpdateBusy = true;
+        ShowUpdateProgress = false;
+        UpdateStatus = "正在检查更新…";
+        try
+        {
+            var info = await AppServices.Updates.CheckAsync();
+            if (info == null)
+            {
+                UpdateStatus = "无法连接更新服务器（GitHub 不可达或限流）。请稍后重试，或到 GitHub/蓝奏云手动下载最新版。";
+                return;
+            }
+            LatestVersion = info.Version;
+            UpdateStatus = info.IsCurrent
+                ? $"已是最新版本 v{AppVersion.Current}。"
+                : $"发现新版本 v{info.Version}（当前 v{AppVersion.Current}）。" + (info.AssetUrl == null ? "当前平台暂未提供安装包。" : "点击「下载并更新」自动安装。");
+        }
+        catch (Exception ex)
+        {
+            UpdateStatus = "检查更新失败：" + ex.Message;
+        }
+        finally { IsUpdateBusy = false; }
+    }
+
+    /// <summary>下载并更新（替换自身后重启）。</summary>
+    [RelayCommand]
+    private async Task DownloadUpdateAsync()
+    {
+        if (IsUpdateBusy) return;
+        try
+        {
+            var info = await AppServices.Updates.CheckAsync();
+            if (info == null) { UpdateStatus = "无法连接更新服务器，请稍后重试。"; return; }
+            if (info.IsCurrent) { UpdateStatus = "已是最新版本。"; return; }
+            if (string.IsNullOrEmpty(info.AssetUrl)) { UpdateStatus = "当前平台暂未提供安装包。"; return; }
+
+            IsUpdateBusy = true;
+            ShowUpdateProgress = true;
+            UpdateStatus = $"正在下载 v{info.Version}…";
+            var progress = new Progress<(long done, long total)>(p =>
+                UpdateProgress = p.total > 0 ? p.done / (double)p.total * 100 : 0);
+            var result = await AppServices.Updates.DownloadAndRestartAsync(info.AssetUrl, progress);
+            UpdateStatus = result.Message;
+            if (result.Restarting)
+            {
+                // 触发应用退出，交给脚本重启
+                UpdateStatus = "更新完成，正在重启…";
+                await Task.Delay(300);
+                Environment.Exit(0);
+            }
+        }
+        catch (Exception ex)
+        {
+            UpdateStatus = "更新失败：" + ex.Message;
+        }
+        finally
+        {
+            IsUpdateBusy = false;
+            ShowUpdateProgress = false;
+        }
+    }
 }

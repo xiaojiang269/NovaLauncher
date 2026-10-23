@@ -84,6 +84,22 @@
                 </StackPanel>
             </Border>
 
+            <Border Background="#222336" CornerRadius="14" Padding="18">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <TextBlock Grid.Column="0" Text="自动更新" Classes="label" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="检查更新" Classes="flat"
+                                Command="{Binding CheckUpdateCommand}" IsEnabled="{Binding !IsUpdateBusy}"/>
+                        <Button Grid.Column="2" Content="下载并更新" Classes="accent"
+                                Command="{Binding DownloadUpdateCommand}" IsEnabled="{Binding !IsUpdateBusy}"/>
+                    </Grid>
+                    <TextBlock Text="自动更新从 GitHub Release 拉取最新版本并替换当前程序。更新源为 GitHub；蓝奏云仍可手动下载。首次发布需先上传安装包到 GitHub Release。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding UpdateStatus}" Classes="status" TextWrapping="Wrap"/>
+                    <ProgressBar Minimum="0" Maximum="100" Value="{Binding UpdateProgress}"
+                                 IsVisible="{Binding ShowUpdateProgress}"/>
+                </StackPanel>
+            </Border>
+
             <Button Content="保存设置" Classes="accent" HorizontalAlignment="Right" Command="{Binding SaveCommand}"/>
         </StackPanel>
     </ScrollViewer>
