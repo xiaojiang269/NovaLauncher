@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using NovaLauncher.Core.Configuration;
 using NovaLauncher.Core.Models;
 
@@ -57,4 +58,92 @@ public sealed class ModService
         Directory.CreateDirectory(d);
         return d;
     }
+
+    /// <summary>读取 jar 的模组标识（id / 版本 / 显示名）。供版本切换、冲突识别使用。</summary>
+    public ModIdentity? ReadIdentity(string versionId, string fileName)
+    {
+        var full = Path.Combine(_dir.VersionModsDir(versionId), fileName);
+        if (!File.Exists(full) || !full.EndsWith(".jar", StringComparison.OrdinalIgnoreCase)) return null;
+        try
+        {
+            using var zip = System.IO.Compression.ZipFile.OpenRead(full);
+            // fabric.mod.json
+            var fabric = zip.GetEntry("fabric.mod.json");
+            if (fabric != null)
+            {
+                using var sr = new StreamReader(fabric.Open());
+                using var doc = System.Text.Json.JsonDocument.Parse(sr.ReadToEnd());
+                var r = doc.RootElement;
+                var id = r.TryGetProperty("id", out var i) ? i.GetString() : null;
+                var ver = r.TryGetProperty("version", out var v) ? v.GetString() : null;
+                var name = r.TryGetProperty("name", out var nn) ? nn.GetString() : null;
+                if (!string.IsNullOrEmpty(id)) return new ModIdentity(id, ver, name, "fabric");
+            }
+            // mods.toml
+            var toml = zip.GetEntry("META-INF/mods.toml");
+            if (toml != null)
+            {
+                using var sr = new StreamReader(toml.Open());
+                var text = sr.ReadToEnd();
+                var id = System.Text.RegularExpressions.Regex.Match(text, @"modId\s*=\s*""([^""]+)""").Groups[1].Value;
+                var ver = System.Text.RegularExpressions.Regex.Match(text, @"version\s*=\s*""([^""]+)""").Groups[1].Value;
+                if (!string.IsNullOrEmpty(id)) return new ModIdentity(id, ver, null, "forge");
+            }
+            // mcmod.info
+            var info = zip.GetEntry("mcmod.info");
+            if (info != null)
+            {
+                using var sr = new StreamReader(info.Open());
+                using var doc = System.Text.Json.JsonDocument.Parse(sr.ReadToEnd());
+                if (doc.RootElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    foreach (var e in doc.RootElement.EnumerateArray())
+                    {
+                        var id2 = e.TryGetProperty("modid", out var i2) ? i2.GetString() : null;
+                        var ver2 = e.TryGetProperty("version", out var v2) ? v2.GetString() : null;
+                        var name2 = e.TryGetProperty("name", out var nn2) ? nn2.GetString() : null;
+                        if (!string.IsNullOrEmpty(id2)) return new ModIdentity(id2, ver2, name2, "forge");
+                    }
+                }
+            }
+        }
+        catch { }
+        return null;
+    }
+
+    /// <summary>一键提取：扫描 mods 目录内嵌套的 jar（如 .zip 资源包或 .litemod 内附带的模组），把其中的 .jar 提取到 mods 目录。</summary>
+    public int ExtractNested(string versionId)
+    {
+        var modsDir = _dir.VersionModsDir(versionId);
+        if (!Directory.Exists(modsDir)) return 0;
+        int extracted = 0;
+        foreach (var file in Directory.GetFiles(modsDir))
+        {
+            var ext = Path.GetExtension(file).ToLowerInvariant();
+            if (ext is not (".zip" or ".litemod" or ".jar")) continue;
+            var name = Path.GetFileName(file);
+            if (name.EndsWith(".disabled", StringComparison.OrdinalIgnoreCase)) continue;
+            try
+            {
+                using var zip = System.IO.Compression.ZipFile.OpenRead(file);
+                foreach (var entry in zip.Entries)
+                {
+                    if (entry.FullName.Contains('/') || entry.FullName.Contains('\\')) continue; // 仅顶层
+                    if (!entry.FullName.EndsWith(".jar", StringComparison.OrdinalIgnoreCase)) continue;
+                    var target = Path.Combine(modsDir, entry.Name);
+                    if (File.Exists(target)) continue;
+                    entry.ExtractToFile(target, true);
+                    extracted++;
+                }
+            }
+            catch { }
+        }
+        return extracted;
+    }
+}
+
+/// <summary>模组标识（从 jar 清单读取）。</summary>
+public sealed record ModIdentity(string Id, string? Version, string? DisplayName, string? Loader)
+{
+    public string Display => string.IsNullOrEmpty(DisplayName) ? Id : DisplayName!;
 }

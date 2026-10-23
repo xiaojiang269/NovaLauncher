@@ -52,6 +52,63 @@ public sealed class ModDependencyChecker
         return result.OrderBy(m => m.Mod).ThenBy(m => m.DepModId).ToList();
     }
 
+    /// <summary>按依赖关系对 mods 目录文件做拓扑排序：被依赖的模组排在前面。返回排序后的文件名列表。</summary>
+    public List<string> TopoSort(string modsDir)
+    {
+        var files = Directory.Exists(modsDir)
+            ? Directory.GetFiles(modsDir)
+                .Where(f => f.EndsWith(".jar", StringComparison.OrdinalIgnoreCase))
+                .Where(f => !Path.GetFileName(f).EndsWith(".disabled", StringComparison.OrdinalIgnoreCase))
+                .Select(f => Path.GetFileName(f)!)
+                .ToList()
+            : new List<string>();
+
+        if (files.Count <= 1) return files;
+
+        // id -> file 映射
+        var idToFile = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var file in files)
+        {
+            var id = ReadId(Path.Combine(modsDir, file));
+            if (id != null) idToFile.TryAdd(id, file);
+        }
+
+        // file -> 依赖的 file 集合
+        var depsOf = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var file in files)
+        {
+            var (id, _, deps) = ReadManifest(Path.Combine(modsDir, file));
+            if (id == null) continue;
+            var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (deps != null)
+                foreach (var (depId, _, mandatory, _) in deps)
+                    if (mandatory && idToFile.ContainsKey(depId) && !string.Equals(depId, id, StringComparison.OrdinalIgnoreCase))
+                        set.Add(idToFile[depId]);
+            depsOf[id] = set;
+        }
+
+        // Kahn 拓扑排序（被依赖的在前，同层按文件名保序）
+        var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var result = new List<string>();
+        void Visit(string file)
+        {
+            if (!visited.Add(file)) return;
+            var id = ReadId(Path.Combine(modsDir, file));
+            if (id != null && depsOf.TryGetValue(id, out var dset))
+                foreach (var d in dset.OrderBy(x => x, StringComparer.OrdinalIgnoreCase))
+                    Visit(d);
+            result.Add(file);
+        }
+        foreach (var f in files.OrderBy(f => f, StringComparer.OrdinalIgnoreCase)) Visit(f);
+        return result;
+    }
+
+    private static string? ReadId(string jarPath)
+    {
+        var (id, _, _) = ReadManifest(jarPath);
+        return id;
+    }
+
     /// <summary>读取 jar 清单：返回 (modId, version, 依赖列表)。</summary>
     private static (string?, string?, List<(string id, string? range, bool mandatory, string? src)>?) ReadManifest(string jarPath)
     {

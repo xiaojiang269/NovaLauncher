@@ -18,6 +18,9 @@
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                     <TextBlock Grid.Column="0" Text="mods 目录中的文件（.jar 为模组，.zip 为资源包）" Classes="label" VerticalAlignment="Center"/>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <Button Content="切换版本" Classes="flat" Command="{Binding SwitchVersionCommand}"/>
+                        <Button Content="一键提取" Classes="flat" Command="{Binding ExtractNestedCommand}"/>
+                        <Button Content="依赖排序" Classes="flat" Command="{Binding SortDepsCommand}"/>
                         <Button Content="检测冲突" Classes="flat" Command="{Binding DetectConflictsCommand}"/>
                         <Button Content="检查依赖" Classes="flat" Command="{Binding CheckDepsCommand}"/>
                         <Button Content="打开模组文件夹" Classes="flat" Command="{Binding OpenFolderCommand}"/>
@@ -47,6 +50,31 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+            </StackPanel>
+        </Border>
+
+        <Border Background="#222336" CornerRadius="14" Padding="18" IsVisible="{Binding ShowVersionPanel}">
+            <StackPanel Spacing="12">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="版本切换 / 降级" Classes="section" FontSize="14" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding VersionPanelTitle}" FontWeight="SemiBold" Foreground="#7CD4A8" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="✕ 关闭" Classes="flat" Command="{Binding CloseVersionPanelCommand}"/>
+                </Grid>
+                <TextBlock Text="从 Modrinth 读取该模组的可用版本。选中一个版本后点「下载替换」，旧文件会移到 mods/.versions-backup/ 备份。适用于升级或降级。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                <ListBox ItemsSource="{Binding RemoteVersions}" SelectedItem="{Binding SelectedRemoteVersion}" Height="180">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Name}"/>
+                                <TextBlock Text="{Binding VersionNumber}" Classes="label" FontSize="11"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button Content="下载替换" Classes="accent" HorizontalAlignment="Right"
+                        Command="{Binding ApplyRemoteVersionCommand}" IsEnabled="{Binding !IsRemoteBusy}"/>
             </StackPanel>
         </Border>
 
