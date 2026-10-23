@@ -69,6 +69,20 @@
                 </StackPanel>
             </Border>
 
+            <Border Background="#222336" CornerRadius="14" Padding="18">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <TextBlock Grid.Column="0" Text="自动诊断" Classes="label" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="运行自动诊断" Classes="accent"
+                                Command="{Binding RunDiagnosticsCommand}" IsEnabled="{Binding !IsDiagBusy}"/>
+                        <Button Grid.Column="2" Content="复制报告" Classes="flat" Command="{Binding CopyDiagCommand}"/>
+                    </Grid>
+                    <TextBlock Text="检查 Java、游戏目录结构、本地版本、磁盘与网络可达性，用于排查启动失败或下载异常。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                    <TextBox Text="{Binding DiagReport}" Classes="code" AcceptsReturn="True" MinHeight="220"
+                             IsReadOnly="True" TextWrapping="NoWrap" FontFamily="monospace" FontSize="12"/>
+                </StackPanel>
+            </Border>
+
             <Button Content="保存设置" Classes="accent" HorizontalAlignment="Right" Command="{Binding SaveCommand}"/>
         </StackPanel>
     </ScrollViewer>
