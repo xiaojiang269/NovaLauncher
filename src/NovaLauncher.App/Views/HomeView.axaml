@@ -110,6 +110,23 @@
                 </StackPanel>
             </Border>
 
+            <!-- 崩溃分析卡片 -->
+            <Border IsVisible="{Binding ShowCrashAnalysis}" Classes="card" BorderBrush="#FF6E6E" BorderThickness="1">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="💥 游戏崩溃分析" FontSize="15" FontWeight="Bold" Foreground="#FF8A8A"/>
+                    <TextBlock Text="{Binding CrashAnalysisResult.Reason}" FontSize="14" FontWeight="SemiBold"
+                               Foreground="#E8EAF6" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding CrashAnalysisResult.Detail}" FontSize="11" Foreground="#9AA0B8"
+                               TextWrapping="Wrap" FontFamily="Consolas, monospace"/>
+                    <TextBlock Text="{Binding CrashAnalysisResult.Suggestion}" FontSize="12" Foreground="#69F0AE"
+                               TextWrapping="Wrap"/>
+                    <TextBlock IsVisible="{Binding ShowCrashLogTail}"
+                               Text="{Binding CrashAnalysisResult.LogTail}" FontSize="11" Foreground="#5C6080"
+                               MaxHeight="140" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                               FontFamily="Consolas, monospace"/>
+                </StackPanel>
+            </Border>
+
             <!-- 日志卡片 -->
             <Border IsVisible="{Binding ShowGameLog}" Classes="card">
                 <StackPanel Spacing="10">

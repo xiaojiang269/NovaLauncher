@@ -87,6 +87,20 @@
             <Border Background="#222336" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="12">
                     <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <TextBlock Grid.Column="0" Text="一键游戏修复" Classes="label" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Content="执行一键修复" Classes="accent"
+                                Command="{Binding RunRepairCommand}" IsEnabled="{Binding !IsRepairBusy}"/>
+                        <Button Grid.Column="2" Content="复制报告" Classes="flat" Command="{Binding CopyRepairCommand}"/>
+                    </Grid>
+                    <TextBlock Text="清理日志与崩溃报告、临时缓存（原生库），修复游戏目录结构，并检查 Java 版本与下载源连通性。适合游戏启动异常、磁盘占用过多时使用。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                    <TextBox Text="{Binding RepairReport}" Classes="code" AcceptsReturn="True" MinHeight="200"
+                             IsReadOnly="True" TextWrapping="NoWrap" FontFamily="monospace" FontSize="12"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#222336" CornerRadius="14" Padding="18">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                         <TextBlock Grid.Column="0" Text="自动更新" Classes="label" VerticalAlignment="Center"/>
                         <Button Grid.Column="1" Content="检查更新" Classes="flat"
                                 Command="{Binding CheckUpdateCommand}" IsEnabled="{Binding !IsUpdateBusy}"/>

@@ -158,6 +158,42 @@ public partial class SettingsViewModel : ViewModelBase
         Status = "诊断报告已复制到剪贴板";
     }
 
+    // ---------- 一键游戏修复 ----------
+
+    [ObservableProperty] private string repairReport = "「一键修复」会清理日志/崩溃报告与临时缓存、修复目录结构、检查 Java 与下载源。";
+    [ObservableProperty] private bool isRepairBusy;
+
+    /// <summary>一键游戏修复（对齐 PCL2 游戏修复工具）。</summary>
+    [RelayCommand]
+    private async Task RunRepairAsync()
+    {
+        IsRepairBusy = true;
+        RepairReport = "正在执行一键修复…";
+        try
+        {
+            var result = await new GameRepairer(AppServices.Config).RepairAsync(CancellationToken.None);
+            RepairReport = string.Join("\n", result.Report);
+            Status = result.Ok ? "一键修复完成，无未处理问题。" : "一键修复完成，存在需要人工处理的问题，见报告。";
+        }
+        catch (Exception ex)
+        {
+            RepairReport = "一键修复失败：" + ex.Message;
+            Status = "一键修复失败";
+        }
+        finally
+        {
+            IsRepairBusy = false;
+        }
+    }
+
+    /// <summary>复制修复报告。</summary>
+    [RelayCommand]
+    private async Task CopyRepairAsync()
+    {
+        await MainWindowRef.CopyToClipboardAsync(RepairReport);
+        Status = "修复报告已复制到剪贴板";
+    }
+
     // ---------- 自动更新 ----------
 
     [ObservableProperty] private string updateStatus = $"当前版本 v{Core.Services.AppVersion.Current}";

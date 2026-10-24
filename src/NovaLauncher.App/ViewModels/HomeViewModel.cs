@@ -49,6 +49,17 @@ public partial class HomeViewModel : ViewModelBase
     [ObservableProperty] private string gameLog = "";
     public bool ShowGameLog => AppServices.Config.ShowGameLog;
 
+    // 崩溃分析
+    [ObservableProperty] private CrashAnalysis? crashAnalysisResult;
+    public bool ShowCrashAnalysis => CrashAnalysisResult is { HasCrash: true };
+    public bool ShowCrashLogTail => CrashAnalysisResult is { LogTail.Length: > 0 };
+
+    partial void OnCrashAnalysisResultChanged(CrashAnalysis? value)
+    {
+        OnPropertyChanged(nameof(ShowCrashAnalysis));
+        OnPropertyChanged(nameof(ShowCrashLogTail));
+    }
+
     public HomeViewModel()
     {
         AccountType = AppServices.Config.AccountType switch
@@ -288,7 +299,26 @@ public partial class HomeViewModel : ViewModelBase
             }));
             if (result.Success)
             {
-                Status = "游戏已启动，可以在日志页查看输出。";
+                Status = "游戏已启动，正在运行…退出后可查看崩溃分析。";
+                // 监听游戏进程退出 → 自动分析崩溃原因（PCL2 同款）
+                if (result.Process != null)
+                {
+                    var proc = result.Process;
+                    var gdDir = _launch.GameDataDir(versionId);
+                    _ = Task.Run(async () =>
+                    {
+                        try { await proc.WaitForExitAsync().ConfigureAwait(false); }
+                        catch { }
+                        var analysis = new CrashAnalyzer().Analyze(gdDir, proc.ExitCode);
+                        Dispatcher.UIThread.Post(() =>
+                        {
+                            CrashAnalysisResult = analysis.HasCrash ? analysis : null;
+                            Status = analysis.HasCrash
+                                ? "游戏已退出（检测到崩溃）：" + analysis.Reason
+                                : "游戏已正常退出。";
+                        });
+                    });
+                }
             }
             else
             {
