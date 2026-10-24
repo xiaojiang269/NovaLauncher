@@ -1,0 +1,39 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="NovaLauncher.App.Views.SplashWindow"
+        Width="520" Height="360"
+        WindowStartupLocation="CenterScreen"
+        WindowDecorations="None"
+        CanResize="False"
+        ShowInTaskbar="True"
+        Background="#13131C">
+    <Grid>
+        <Border Background="#13131C" CornerRadius="20" BorderBrush="#2E3058" BorderThickness="1" Margin="6">
+            <StackPanel Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center" Width="360">
+                <!-- Logo 动画：渐显 + 轻微放大 -->
+                <Border Width="96" Height="96" CornerRadius="26" Background="#7C4DFF" HorizontalAlignment="Center">
+                    <Border.Transitions>
+                        <Transitions>
+                            <DoubleTransition Property="Opacity" Duration="0:0:0.8"/>
+                        </Transitions>
+                    </Border.Transitions>
+                    <TextBlock Text="🎮" FontSize="52" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+
+                <StackPanel Spacing="6" HorizontalAlignment="Center">
+                    <TextBlock Text="NovaLauncher" FontSize="28" FontWeight="Bold"
+                               Foreground="#E8EAF6" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Minecraft 第三方启动器" FontSize="12"
+                               Foreground="#5C6080" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- 加载进度条动画 -->
+                <ProgressBar IsIndeterminate="True" Width="300" Height="6"
+                             HorizontalAlignment="Center" Foreground="#7C4DFF"/>
+
+                <TextBlock Text="正在初始化运行环境…" FontSize="11"
+                           Foreground="#9AA0B8" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
