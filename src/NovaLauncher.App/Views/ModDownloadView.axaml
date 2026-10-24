@@ -28,8 +28,8 @@
 
         <!-- 结果区 -->
         <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
-            <!-- 模组列表 -->
-            <Border Background="#222336" CornerRadius="14" Padding="12">
+            <!-- 模组列表（左列） -->
+            <Border Grid.Column="0" Background="#222336" CornerRadius="14" Padding="12">
                 <StackPanel Spacing="8">
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock Text="搜索结果" Classes="label" VerticalAlignment="Center"/>
@@ -53,8 +53,8 @@
                 </StackPanel>
             </Border>
 
-            <!-- 版本列表 -->
-            <Border Background="#222336" CornerRadius="14" Padding="12">
+            <!-- 版本列表（右列） -->
+            <Border Grid.Column="1" Background="#222336" CornerRadius="14" Padding="12">
                 <StackPanel Spacing="8">
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock Text="可用版本（选中后下载）" Classes="label" VerticalAlignment="Center"/>
