@@ -9,7 +9,7 @@ namespace NovaLauncher.Core.Services;
 public static class AppVersion
 {
     /// <summary>当前版本号（与 GitHub Release tag 对应，不带 v 前缀）。</summary>
-    public const string Current = "3.1.6";
+    public const string Current = "3.1.7";
 
     public static string Tag => "v" + Current;
 }

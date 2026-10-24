@@ -42,6 +42,8 @@ public partial class HomeViewModel : ViewModelBase
     // 状态
     [ObservableProperty] private string status = "就绪";
     [ObservableProperty] private bool isBusy;
+    [ObservableProperty] private string launchButtonText = "▶  启动游戏";
+    public bool ShowLaunchProgress => IsBusy;
     [ObservableProperty] private bool showProgress;
     [ObservableProperty] private int progressValue;
     [ObservableProperty] private int progressMax = 1;
@@ -245,6 +247,7 @@ public partial class HomeViewModel : ViewModelBase
 
         var versionId = SelectedVersion;
         IsBusy = true;
+        LaunchButtonText = "⏳ 准备中…";
         try
         {
             // 1. 确保版本完整（下载补全，幂等）
@@ -300,6 +303,7 @@ public partial class HomeViewModel : ViewModelBase
             if (result.Success)
             {
                 Status = "游戏已启动，正在运行…退出后可查看崩溃分析。";
+                LaunchButtonText = "🟢 游戏中";
                 // 监听游戏进程退出 → 自动分析崩溃原因（PCL2 同款）
                 if (result.Process != null)
                 {
@@ -313,6 +317,7 @@ public partial class HomeViewModel : ViewModelBase
                         Dispatcher.UIThread.Post(() =>
                         {
                             CrashAnalysisResult = analysis.HasCrash ? analysis : null;
+                            LaunchButtonText = "▶  启动游戏";
                             Status = analysis.HasCrash
                                 ? "游戏已退出（检测到崩溃）：" + analysis.Reason
                                 : "游戏已正常退出。";
@@ -324,11 +329,13 @@ public partial class HomeViewModel : ViewModelBase
             {
                 Status = result.Message;
                 GameLog = string.Join("\n", result.Log);
+                LaunchButtonText = "▶  启动游戏";
             }
         }
         catch (Exception ex)
         {
             Status = "启动失败：" + ex.Message;
+            LaunchButtonText = "▶  启动游戏";
         }
         finally
         {

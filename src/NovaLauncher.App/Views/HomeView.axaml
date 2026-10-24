@@ -93,9 +93,16 @@
                         </StackPanel>
                     </Grid>
 
-                    <!-- 大启动按钮 -->
+                    <!-- 大启动按钮（PCL 风格：启动时按钮内显示加载进度动画） -->
                     <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center" Margin="0,8,0,0">
-                        <Button Content="▶  启动游戏" Classes="launch" Command="{Binding LaunchCommand}"/>
+                        <Button Classes="launch" Command="{Binding LaunchCommand}" MinWidth="230">
+                            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                <ProgressBar IsVisible="{Binding ShowLaunchProgress}" IsIndeterminate="True"
+                                             Width="120" Height="7" VerticalAlignment="Center"
+                                             Foreground="White"/>
+                                <TextBlock Text="{Binding LaunchButtonText}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
                         <Button Content="下载补全" Classes="flat" Command="{Binding DownloadVersionCommand}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>

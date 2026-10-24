@@ -104,8 +104,10 @@
                 </Border>
                 <TransitioningContentControl Content="{Binding CurrentPage}" Margin="0">
                     <TransitioningContentControl.PageTransition>
+                        <!-- PCL 风格：内容淡入淡出 + 轻微上移浮现 -->
                         <CompositePageTransition>
-                            <PageSlide Duration="0:0:0.18" Orientation="Horizontal"/>
+                            <CrossFade Duration="0:0:0.28"/>
+                            <PageSlide Duration="0:0:0.28" Orientation="Vertical"/>
                         </CompositePageTransition>
                     </TransitioningContentControl.PageTransition>
                 </TransitioningContentControl>
