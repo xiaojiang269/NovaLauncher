@@ -9,7 +9,7 @@ namespace NovaLauncher.Core.Services;
 public static class AppVersion
 {
     /// <summary>当前版本号（与 GitHub Release tag 对应，不带 v 前缀）。</summary>
-    public const string Current = "3.1.3";
+    public const string Current = "3.1.4";
 
     public static string Tag => "v" + Current;
 }
@@ -19,6 +19,18 @@ public sealed class UpdateService
 {
     private const string Repo = "xiaojiang269/NovaLauncher";
     private const string ReleasesApi = $"https://api.github.com/repos/{Repo}/releases/latest";
+
+    /// <summary>
+    /// GitHub 加速镜像前缀（中国大陆可访问）。空串=直连优先；
+    /// 直连失败时依次尝试国内镜像，解决 github.com:443 连接超时导致的更新失败。
+    /// </summary>
+    private static readonly string[] DownloadMirrors =
+    {
+        "",                          // 直连（优先，海外/代理环境最快）
+        "https://ghfast.top/",
+        "https://gh-proxy.com/",
+        "https://ghproxy.net/",
+    };
 
     /// <summary>最新发布信息。</summary>
     public sealed record UpdateInfo(string Version, string Tag, string? AssetUrl, string? AssetName, string? Body, bool IsCurrent);
@@ -30,7 +42,20 @@ public sealed class UpdateService
         try
         {
             var http = Http.Get();
-            var json = await http.GetStringAsync(ReleasesApi, ct).ConfigureAwait(false);
+            string? json = null;
+            foreach (var m in DownloadMirrors)
+            {
+                try
+                {
+                    json = await http.GetStringAsync(m + ReleasesApi, ct).ConfigureAwait(false);
+                    break;
+                }
+                catch
+                {
+                    // 直连或该镜像不可达，尝试下一个
+                }
+            }
+            if (json == null) return null;
             using var doc = JsonDocument.Parse(json);
             var r = doc.RootElement;
             var tag = (r.TryGetProperty("tag_name", out var t) ? t.GetString() : null) ?? "";
@@ -74,7 +99,21 @@ public sealed class UpdateService
         var zipPath = Path.Combine(tmpDir, "update.zip");
         try
         {
-            await Http.DownloadAsync(assetUrl, zipPath, progress, ct).ConfigureAwait(false);
+            // 依次尝试直连与国内镜像，解决 github.com:443 超时
+            Exception? lastEx = null;
+            bool downloaded = false;
+            foreach (var m in DownloadMirrors)
+            {
+                try
+                {
+                    await Http.DownloadAsync(m + assetUrl, zipPath, progress, ct).ConfigureAwait(false);
+                    downloaded = true;
+                    break;
+                }
+                catch (Exception ex) { lastEx = ex; }
+            }
+            if (!downloaded)
+                return new UpdateResult(false, "更新下载失败：" + (lastEx?.Message ?? "网络不可达，请稍后重试或手动下载。"));
             var extractDir = Path.Combine(tmpDir, "pkg");
             ZipFile.ExtractToDirectory(zipPath, extractDir);
             var packageRoot = FindPackageRoot(extractDir, exePath);
