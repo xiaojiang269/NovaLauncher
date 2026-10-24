@@ -16,7 +16,7 @@ public partial class ModDownloadViewModel : ViewModelBase
     public ObservableCollection<string> Loaders { get; } = new() { "不限", "fabric", "forge", "quilt", "neoforge" };
     public ObservableCollection<string> ProjectTypes { get; } = new() { "模组", "光影", "资源包", "整合包" };
     public ObservableCollection<string> GameVersions { get; } = new()
-        { "1.21.1", "1.20.6", "1.20.4", "1.20.1", "1.19.4", "1.18.2", "1.17.1", "1.16.5", "1.12.2" };
+        { "不限", "1.21.4", "1.21.1", "1.20.6", "1.20.4", "1.20.1", "1.19.4", "1.18.2", "1.17.1", "1.16.5", "1.15.2", "1.14.4", "1.12.2" };
 
     public ObservableCollection<ModSearchItem> Projects { get; } = new();
     [ObservableProperty] private ModSearchItem? selectedProject;
@@ -29,7 +29,7 @@ public partial class ModDownloadViewModel : ViewModelBase
     [ObservableProperty] private int sourceIndex;
     [ObservableProperty] private int projectTypeIndex;
     [ObservableProperty] private string searchText = "";
-    [ObservableProperty] private string gameVersion = "1.20.1";
+    [ObservableProperty] private string gameVersion = "不限";
     [ObservableProperty] private int loaderIndex;
     [ObservableProperty] private string status = "就绪";
     [ObservableProperty] private bool isBusy;
@@ -38,6 +38,13 @@ public partial class ModDownloadViewModel : ViewModelBase
 
     public ModDownloadViewModel()
     {
+        // 把本地已安装版本加入游戏版本下拉（排在"不限"之后，去重），方便筛选自己的版本
+        var insertIdx = 1;
+        foreach (var v in AppServices.Dir.ListInstalledVersions())
+        {
+            if (string.IsNullOrWhiteSpace(v) || v == "不限" || GameVersions.Contains(v)) continue;
+            GameVersions.Insert(insertIdx++, v);
+        }
         foreach (var v in AppServices.Dir.ListInstalledVersions()) LocalVersions.Add(v);
         TargetVersion = LocalVersions.FirstOrDefault();
     }
@@ -75,14 +82,15 @@ public partial class ModDownloadViewModel : ViewModelBase
         try
         {
             var loader = SelectedLoader;
+            var gv = GameVersion == "不限" ? null : GameVersion;
             if (UseCurse)
             {
-                var items = await _curse.SearchAsync(AppServices.Config.CurseForgeApiKey, SearchText, GameVersion, loader, CurseClassId(SelectedProjectType));
+                var items = await _curse.SearchAsync(AppServices.Config.CurseForgeApiKey, SearchText, gv, loader, CurseClassId(SelectedProjectType));
                 foreach (var i in items) Projects.Add(i);
             }
             else
             {
-                var items = await _modrinth.SearchAsync(SearchText, GameVersion, loader, SelectedProjectType);
+                var items = await _modrinth.SearchAsync(SearchText, gv, loader, SelectedProjectType);
                 foreach (var i in items)
                     Projects.Add(new ModSearchItem
                     {
@@ -116,14 +124,15 @@ public partial class ModDownloadViewModel : ViewModelBase
         try
         {
             var loader = SelectedLoader;
+            var gv = GameVersion == "不限" ? null : GameVersion;
             if (project.Source == "curseforge")
             {
-                var files = await _curse.GetFilesAsync(AppServices.Config.CurseForgeApiKey, project.ModId, GameVersion, loader);
+                var files = await _curse.GetFilesAsync(AppServices.Config.CurseForgeApiKey, project.ModId, gv, loader);
                 foreach (var f in files) Versions.Add(f);
             }
             else
             {
-                var list = await _modrinth.GetVersionsAsync(project.ModId, GameVersion, loader);
+                var list = await _modrinth.GetVersionsAsync(project.ModId, gv, loader);
                 foreach (var v in list)
                 {
                     var f = v.Files.FirstOrDefault(x => x.Primary) ?? v.Files.FirstOrDefault();
@@ -220,11 +229,12 @@ public partial class ModDownloadViewModel : ViewModelBase
             try
             {
                 ModFileVersion? v = null;
+                var gv = GameVersion == "不限" ? null : GameVersion;
                 if (proj.Source == "curseforge")
-                    v = (await _curse.GetFilesAsync(AppServices.Config.CurseForgeApiKey, proj.ModId, GameVersion, SelectedLoader)).FirstOrDefault();
+                    v = (await _curse.GetFilesAsync(AppServices.Config.CurseForgeApiKey, proj.ModId, gv, SelectedLoader)).FirstOrDefault();
                 else
                 {
-                    var list = await _modrinth.GetVersionsAsync(proj.ModId, GameVersion, SelectedLoader);
+                    var list = await _modrinth.GetVersionsAsync(proj.ModId, gv, SelectedLoader);
                     var f = list.SelectMany(x => x.Files).FirstOrDefault(y => y.Primary) ?? list.SelectMany(x => x.Files).FirstOrDefault();
                     if (f != null)
                         v = new ModFileVersion { FileName = f.Filename, DownloadUrl = f.Url, Size = f.Size, GameVersions = list.FirstOrDefault()?.GameVersions ?? Array.Empty<string>() };
