@@ -12,8 +12,11 @@
                 <TextBlock Text="管理你的账户与启动配置" FontSize="12" Foreground="#5C6080"/>
             </StackPanel>
 
-            <!-- 账户卡片 -->
-            <Border Classes="card">
+            <!-- 账户卡片（PCL 浮现动效） -->
+            <Border x:Name="AccountCard" Classes="card" Opacity="0">
+                <Border.RenderTransform>
+                    <TranslateTransform Y="18"/>
+                </Border.RenderTransform>
                 <StackPanel Spacing="14">
                     <StackPanel Orientation="Horizontal" Spacing="14">
                         <!-- 头像 -->
@@ -59,8 +62,11 @@
                 </StackPanel>
             </Border>
 
-            <!-- 启动配置卡片 -->
-            <Border Classes="card">
+            <!-- 启动配置卡片（PCL 浮现动效） -->
+            <Border x:Name="LaunchConfigCard" Classes="card" Opacity="0">
+                <Border.RenderTransform>
+                    <TranslateTransform Y="18"/>
+                </Border.RenderTransform>
                 <StackPanel Spacing="16">
                     <TextBlock Text="启动配置" FontSize="18" FontWeight="SemiBold" Foreground="#E8EAF6"/>
 
@@ -109,7 +115,10 @@
             </Border>
 
             <!-- 进度卡片 -->
-            <Border IsVisible="{Binding ShowProgress}" Classes="card">
+            <Border x:Name="ProgressCard" IsVisible="{Binding ShowProgress}" Classes="card" Opacity="0">
+                <Border.RenderTransform>
+                    <TranslateTransform Y="18"/>
+                </Border.RenderTransform>
                 <StackPanel Spacing="10">
                     <TextBlock Text="下载进度" FontSize="14" FontWeight="SemiBold" Foreground="#E8EAF6"/>
                     <ProgressBar Minimum="0" Maximum="{Binding ProgressMax}" Value="{Binding ProgressValue}"/>
@@ -118,7 +127,10 @@
             </Border>
 
             <!-- 崩溃分析卡片 -->
-            <Border IsVisible="{Binding ShowCrashAnalysis}" Classes="card" BorderBrush="#FF6E6E" BorderThickness="1">
+            <Border x:Name="CrashCard" IsVisible="{Binding ShowCrashAnalysis}" Classes="card" BorderBrush="#FF6E6E" BorderThickness="1" Opacity="0">
+                <Border.RenderTransform>
+                    <TranslateTransform Y="18"/>
+                </Border.RenderTransform>
                 <StackPanel Spacing="10">
                     <TextBlock Text="💥 游戏崩溃分析" FontSize="15" FontWeight="Bold" Foreground="#FF8A8A"/>
                     <TextBlock Text="{Binding CrashAnalysisResult.Reason}" FontSize="14" FontWeight="SemiBold"
@@ -135,7 +147,10 @@
             </Border>
 
             <!-- 日志卡片 -->
-            <Border IsVisible="{Binding ShowGameLog}" Classes="card">
+            <Border x:Name="GameLogCard" IsVisible="{Binding ShowGameLog}" Classes="card" Opacity="0">
+                <Border.RenderTransform>
+                    <TranslateTransform Y="18"/>
+                </Border.RenderTransform>
                 <StackPanel Spacing="10">
                     <TextBlock Text="游戏 / 启动日志" FontSize="14" FontWeight="SemiBold" Foreground="#E8EAF6"/>
                     <TextBox Text="{Binding GameLog}" Height="200" IsReadOnly="True"
