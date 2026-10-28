@@ -7,7 +7,7 @@
         <TextBlock Text="服务器快捷入口" Classes="section"/>
         <TextBlock Text="{Binding Status}" Classes="status" TextWrapping="Wrap"/>
 
-        <Border Background="#222336" CornerRadius="14" Padding="18">
+        <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
             <StackPanel Spacing="12">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                     <TextBlock Grid.Column="0" Text="我的服务器" Classes="label" VerticalAlignment="Center"/>
@@ -31,7 +31,7 @@
                 </ListBox>
 
                 <!-- 编辑表单 -->
-                <Border IsVisible="{Binding IsEditing}" Background="#1C1D2E" CornerRadius="10" Padding="14">
+                <Border IsVisible="{Binding IsEditing}" Background="#F5F6F8" CornerRadius="10" Padding="14">
                     <StackPanel Spacing="10">
                         <TextBlock Text="编辑服务器" Classes="label"/>
                         <Grid ColumnDefinitions="90,*,90,150" ColumnSpacing="8" RowDefinitions="Auto,Auto">

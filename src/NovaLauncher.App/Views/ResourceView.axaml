@@ -8,7 +8,7 @@
         <TextBlock Text="按版本管理资源包（resourcepacks）与光影包（shaderpacks）：导入 zip、启用/禁用、删除、打开文件夹。" Classes="status"/>
         <TextBlock Text="{Binding Status}" Classes="status"/>
 
-        <Border Background="#222336" CornerRadius="14" Padding="18">
+        <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
             <StackPanel Spacing="12">
                 <Grid ColumnDefinitions="160,*,Auto,Auto" ColumnSpacing="8">
                     <TextBlock Text="选择版本" VerticalAlignment="Center" Classes="label"/>

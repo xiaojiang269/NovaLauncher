@@ -9,37 +9,38 @@
         Width="1200" Height="780" MinWidth="1020" MinHeight="640"
         WindowStartupLocation="CenterScreen"
         Title="NovaLauncher · Minecraft 第三方启动器"
-        Background="#1A1B26">
+        Background="#F2F3F5">
 
     <Window.Styles>
         <Style Selector="ListBoxItem.navitem">
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Margin" Value="0,2"/>
-            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         </Style>
         <Style Selector="ListBoxItem.navitem:selected">
-            <Setter Property="Background" Value="#2E3058"/>
+            <Setter Property="Background" Value="#E3F2FD"/>
         </Style>
         <Style Selector="ListBoxItem.navitem:pointerover">
-            <Setter Property="Background" Value="#252742"/>
+            <Setter Property="Background" Value="#F5F6F8"/>
         </Style>
     </Window.Styles>
 
     <DockPanel>
-        <!-- 左侧导航栏 -->
-        <Border DockPanel.Dock="Left" Width="210" Background="#13131C">
+        <!-- 左侧导航栏（HMCL 白色） -->
+        <Border DockPanel.Dock="Left" Width="210" Background="White"
+                BorderBrush="#E4E6EA" BorderThickness="0,0,1,0">
             <DockPanel>
                 <!-- Logo 区域 -->
-                <Border DockPanel.Dock="Top" Padding="20,24,20,18" Background="#101018">
+                <Border DockPanel.Dock="Top" Padding="20,24,20,18" Background="White">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Border Width="38" Height="38" CornerRadius="10" Background="#7C4DFF" VerticalAlignment="Center">
+                        <Border Width="38" Height="38" CornerRadius="8" Background="#1976D2" VerticalAlignment="Center">
                             <TextBlock Text="🎮" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="NovaLauncher" FontSize="17" FontWeight="Bold" Foreground="#E8EAF6"/>
-                            <TextBlock Text="Minecraft 启动器" FontSize="10" Foreground="#5C6080"/>
+                            <TextBlock Text="NovaLauncher" FontSize="17" FontWeight="Bold" Foreground="#212121"/>
+                            <TextBlock Text="Minecraft 启动器" FontSize="10" Foreground="#9E9E9E"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -47,8 +48,8 @@
                 <!-- 底部信息 -->
                 <Border DockPanel.Dock="Bottom" Padding="16,12">
                     <StackPanel Spacing="2">
-                        <TextBlock Text="{Binding CurrentVersionText}" FontSize="10" Foreground="#5C6080"/>
-                        <TextBlock Text="跨平台 · C# / Avalonia" FontSize="9" Foreground="#3D4060"/>
+                        <TextBlock Text="{Binding CurrentVersionText}" FontSize="10" Foreground="#9E9E9E"/>
+                        <TextBlock Text="跨平台 · C# / Avalonia" FontSize="9" Foreground="#BDBDBD"/>
                     </StackPanel>
                 </Border>
 
@@ -63,7 +64,7 @@
                         <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
                             <Setter Property="Padding" Value="0"/>
                             <Setter Property="Margin" Value="0,2"/>
-                            <Setter Property="CornerRadius" Value="10"/>
+                            <Setter Property="CornerRadius" Value="8"/>
                             <Setter Property="Background" Value="Transparent"/>
                             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                         </ControlTheme>
@@ -72,15 +73,15 @@
                         <DataTemplate x:DataType="vm:NavItem">
                             <Grid ColumnDefinitions="4,40,*" Height="44">
                                 <Border Grid.Column="0" Width="3" CornerRadius="2" VerticalAlignment="Stretch"
-                                        Background="#7C4DFF" Margin="0,8,0,8"
+                                        Background="#1976D2" Margin="0,8,0,8"
                                         IsVisible="{Binding $parent[ListBoxItem].IsSelected}"/>
-                                <Border Grid.Column="1" Width="32" Height="32" CornerRadius="8"
-                                        Background="#1E1F30" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <Border Grid.Column="1" Width="32" Height="32" CornerRadius="6"
+                                        Background="#F0F1F3" VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <TextBlock Text="{Binding Icon}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Grid.Column="2" Text="{Binding Title}" FontSize="14"
                                            VerticalAlignment="Center" Margin="6,0,0,0"
-                                           Foreground="#C5CAE9"/>
+                                           Foreground="#424242"/>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -89,22 +90,21 @@
         </Border>
 
         <!-- 右侧内容区 -->
-        <Border Background="#1A1B26">
+        <Border Background="#F2F3F5">
             <DockPanel>
                 <!-- 更新提示条 -->
-                <Border DockPanel.Dock="Top" Background="#2E3058" CornerRadius="0" Padding="16,10"
+                <Border DockPanel.Dock="Top" Background="#E3F2FD" CornerRadius="0" Padding="16,10"
                         IsVisible="{Binding ShowUpdateBanner}">
                     <Grid ColumnDefinitions="*,Auto">
                         <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                             <TextBlock Text="🔄" FontSize="16"/>
-                            <TextBlock Text="{Binding UpdateBannerText}" Foreground="#E8EAF6" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding UpdateBannerText}" Foreground="#1565C0" VerticalAlignment="Center"/>
                         </StackPanel>
                         <Button Grid.Column="1" Content="✕" Classes="flat" Command="{Binding DismissUpdateCommand}"/>
                     </Grid>
                 </Border>
                 <TransitioningContentControl Content="{Binding CurrentPage}" Margin="0">
                     <TransitioningContentControl.PageTransition>
-                        <!-- PCL 风格：内容淡入淡出 + 轻微上移浮现 -->
                         <CompositePageTransition>
                             <CrossFade Duration="0:0:0.28"/>
                             <PageSlide Duration="0:0:0.28" Orientation="Vertical"/>

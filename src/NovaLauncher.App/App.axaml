@@ -2,22 +2,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="NovaLauncher.App.App"
              xmlns:local="using:NovaLauncher.App"
-             RequestedThemeVariant="Dark">
+             RequestedThemeVariant="Light">
 
     <Application.Resources>
         <ResourceDictionary>
-            <Color x:Key="BgMain">#1A1B26</Color>
-            <Color x:Key="BgNav">#13131C</Color>
-            <Color x:Key="BgCard">#222336</Color>
-            <Color x:Key="BgInput">#1C1D2E</Color>
-            <Color x:Key="BorderColor">#2E3048</Color>
-            <Color x:Key="TextPrimary">#E8EAF6</Color>
-            <Color x:Key="TextSecondary">#9AA0B8</Color>
-            <Color x:Key="TextMuted">#5C6080</Color>
-            <Color x:Key="AccentPurple">#7C4DFF</Color>
-            <Color x:Key="AccentBlue">#536DFE</Color>
-            <Color x:Key="AccentGreen">#69F0AE</Color>
-            <Color x:Key="AccentRed">#FF5252</Color>
+            <!-- HMCL 风格：浅色 Material Design -->
+            <Color x:Key="BgMain">#F2F3F5</Color>
+            <Color x:Key="BgNav">#FFFFFF</Color>
+            <Color x:Key="BgCard">#FFFFFF</Color>
+            <Color x:Key="BgInput">#F5F6F8</Color>
+            <Color x:Key="BorderColor">#E4E6EA</Color>
+            <Color x:Key="TextPrimary">#212121</Color>
+            <Color x:Key="TextSecondary">#616161</Color>
+            <Color x:Key="TextMuted">#9E9E9E</Color>
+            <Color x:Key="AccentBlue">#1976D2</Color>
+            <Color x:Key="AccentBlueLight">#2196F3</Color>
+            <Color x:Key="AccentGreen">#43A047</Color>
+            <Color x:Key="AccentRed">#E53935</Color>
 
             <SolidColorBrush x:Key="BgMainBrush" Color="{StaticResource BgMain}"/>
             <SolidColorBrush x:Key="BgNavBrush" Color="{StaticResource BgNav}"/>
@@ -27,7 +28,8 @@
             <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
             <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
             <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource TextMuted}"/>
-            <SolidColorBrush x:Key="AccentPurpleBrush" Color="{StaticResource AccentPurple}"/>
+            <SolidColorBrush x:Key="AccentBlueBrush" Color="{StaticResource AccentBlue}"/>
+            <SolidColorBrush x:Key="AccentBlueLightBrush" Color="{StaticResource AccentBlueLight}"/>
             <SolidColorBrush x:Key="AccentGreenBrush" Color="{StaticResource AccentGreen}"/>
         </ResourceDictionary>
     </Application.Resources>
@@ -49,18 +51,11 @@
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
         </Style>
 
-        <!-- 主按钮 -->
+        <!-- 主按钮（HMCL 蓝色实色） -->
         <Style Selector="Button.accent">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#7C4DFF" Offset="0"/>
-                        <GradientStop Color="#536DFE" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Background" Value="{StaticResource AccentBlueBrush}"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Padding" Value="20,10"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="FontSize" Value="14"/>
@@ -68,22 +63,14 @@
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
         <Style Selector="Button.accent:pointerover">
-            <Setter Property="Opacity" Value="0.88"/>
+            <Setter Property="Background" Value="{StaticResource AccentBlueLightBrush}"/>
         </Style>
 
-        <!-- 大启动按钮 -->
+        <!-- 大启动按钮（HMCL 蓝色实心） -->
         <Style Selector="Button.launch">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="#7C4DFF" Offset="0"/>
-                        <GradientStop Color="#536DFE" Offset="0.5"/>
-                        <GradientStop Color="#448AFF" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Background" Value="{StaticResource AccentBlueBrush}"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="48,16"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="FontSize" Value="18"/>
@@ -91,51 +78,52 @@
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
         <Style Selector="Button.launch:pointerover">
-            <Setter Property="Opacity" Value="0.9"/>
+            <Setter Property="Background" Value="{StaticResource AccentBlueLightBrush}"/>
         </Style>
 
-        <!-- 扁平按钮 -->
+        <!-- 扁平按钮（白底浅灰边） -->
         <Style Selector="Button.flat">
-            <Setter Property="Background" Value="#2A2C44"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Padding" Value="14,8"/>
             <Setter Property="FontSize" Value="13"/>
-            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
         <Style Selector="Button.flat:pointerover">
-            <Setter Property="Background" Value="#36395A"/>
+            <Setter Property="Background" Value="#F0F1F3"/>
         </Style>
 
         <Style Selector="Button.danger">
-            <Setter Property="Background" Value="#B3261E"/>
+            <Setter Property="Background" Value="#E53935"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Padding" Value="14,8"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
-        <!-- 输入框 -->
+        <!-- 输入框（浅色） -->
         <Style Selector="TextBox">
             <Setter Property="Background" Value="{StaticResource BgInputBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Padding" Value="10,8"/>
             <Setter Property="FontSize" Value="13"/>
         </Style>
         <Style Selector="TextBox:focus">
-            <Setter Property="BorderBrush" Value="{StaticResource AccentPurpleBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource AccentBlueBrush}"/>
         </Style>
 
         <Style Selector="ComboBox">
-            <Setter Property="Background" Value="{StaticResource BgInputBrush}"/>
+            <Setter Property="Background" Value="White"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
-            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Padding" Value="10,6"/>
             <Setter Property="FontSize" Value="13"/>
         </Style>
@@ -147,16 +135,16 @@
         </Style>
         <Style Selector="ListBoxItem">
             <Setter Property="Padding" Value="12,8"/>
-            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
             <Setter Property="FontSize" Value="13"/>
         </Style>
         <Style Selector="ListBoxItem:selected">
-            <Setter Property="Background" Value="#3D3F66"/>
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#E3F2FD"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBlueBrush}"/>
         </Style>
         <Style Selector="ListBoxItem:pointerover">
-            <Setter Property="Background" Value="#2E3050"/>
+            <Setter Property="Background" Value="#F0F1F3"/>
         </Style>
 
         <!-- 文字 -->
@@ -185,23 +173,16 @@
 
         <!-- 进度条 -->
         <Style Selector="ProgressBar">
-            <Setter Property="Height" Value="8"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Background" Value="#2E3050"/>
-            <Setter Property="Foreground">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="#7C4DFF" Offset="0"/>
-                        <GradientStop Color="#00E5FF" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Height" Value="6"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Background" Value="#E4E6EA"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentBlueBrush}"/>
         </Style>
 
-        <!-- 卡片：实色深色 -->
+        <!-- 卡片：白色圆角（HMCL 风格） -->
         <Style Selector="Border.card">
-            <Setter Property="Background" Value="{StaticResource BgCardBrush}"/>
-            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="10"/>
             <Setter Property="Padding" Value="20"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>

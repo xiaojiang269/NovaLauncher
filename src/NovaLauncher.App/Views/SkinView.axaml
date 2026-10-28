@@ -8,7 +8,7 @@
         <TextBlock Text="使用皮肤库 · 记录所有已导入皮肤" Classes="subsection"/>
         <TextBlock Text="{Binding Status}" Classes="status" TextWrapping="Wrap"/>
 
-        <Border Background="#222336" CornerRadius="14" Padding="18">
+        <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
             <StackPanel Spacing="12">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                     <TextBlock Grid.Column="0" Text="已导入皮肤" Classes="label" VerticalAlignment="Center"/>
@@ -28,15 +28,15 @@
                     </ListBox.ItemsPanel>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="150" Margin="4" Padding="10" CornerRadius="12" Background="#1C1D2E">
+                            <Border Width="150" Margin="4" Padding="10" CornerRadius="12" Background="#F5F6F8">
                                 <StackPanel Spacing="8">
                                     <Border Height="120" Background="#151A26" CornerRadius="8" HorizontalAlignment="Stretch">
                                         <Image Source="{Binding Preview}" Stretch="Uniform" Margin="6"/>
                                     </Border>
                                     <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                     <TextBlock Text="{Binding ImportedAt}" Classes="label" FontSize="10" TextAlignment="Center"/>
-                                    <Border Background="#69F0AE22" CornerRadius="6" Padding="4" HorizontalAlignment="Center" IsVisible="{Binding IsActive}">
-                                        <TextBlock Text="✓ 使用中" Foreground="#69F0AE" FontSize="10" FontWeight="Bold"/>
+                                    <Border Background="#43A04722" CornerRadius="6" Padding="4" HorizontalAlignment="Center" IsVisible="{Binding IsActive}">
+                                        <TextBlock Text="✓ 使用中" Foreground="#43A047" FontSize="10" FontWeight="Bold"/>
                                     </Border>
                                 </StackPanel>
                             </Border>

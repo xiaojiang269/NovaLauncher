@@ -7,7 +7,7 @@
         <TextBlock Text="模组管理" Classes="section"/>
         <TextBlock Text="{Binding Status}" Classes="status"/>
 
-        <Border Background="#222336" CornerRadius="14" Padding="18">
+        <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
             <StackPanel Spacing="12">
                 <Grid ColumnDefinitions="160,*" ColumnSpacing="10">
                     <TextBlock Text="选择版本" VerticalAlignment="Center" Classes="label"/>
@@ -54,7 +54,7 @@
             </StackPanel>
         </Border>
 
-        <Border Background="#222336" CornerRadius="14" Padding="18" IsVisible="{Binding ShowVersionPanel}">
+        <Border Background="#FFFFFF" CornerRadius="14" Padding="18" IsVisible="{Binding ShowVersionPanel}">
             <StackPanel Spacing="12">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                     <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
@@ -79,7 +79,7 @@
             </StackPanel>
         </Border>
 
-        <Border Background="#222336" CornerRadius="14" Padding="18" IsVisible="{Binding ShowVerifyPanel}">
+        <Border Background="#FFFFFF" CornerRadius="14" Padding="18" IsVisible="{Binding ShowVerifyPanel}">
             <StackPanel Spacing="12">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                     <TextBlock Grid.Column="0" Text="模组识别校验" Classes="section" FontSize="14" VerticalAlignment="Center"/>
@@ -90,7 +90,7 @@
             </StackPanel>
         </Border>
 
-        <Border Background="#222336" CornerRadius="14" Padding="18" IsVisible="{Binding ShowConflicts}">
+        <Border Background="#FFFFFF" CornerRadius="14" Padding="18" IsVisible="{Binding ShowConflicts}">
             <StackPanel Spacing="10">
                 <TextBlock Text="⚠ 模组冲突" Classes="section" FontSize="14"/>
                 <TextBlock Text="同一模组存在多个 jar，可能导致无法启动或报错，请保留一个版本、删除其余。" Classes="label" TextWrapping="Wrap"/>
@@ -112,7 +112,7 @@
                 </ItemsControl>
             </StackPanel>
         </Border>
-        <Border Background="#222336" CornerRadius="14" Padding="18" IsVisible="{Binding ShowMissingDeps}">
+        <Border Background="#FFFFFF" CornerRadius="14" Padding="18" IsVisible="{Binding ShowMissingDeps}">
             <StackPanel Spacing="10">
                 <TextBlock Text="⚠ 缺失的前置模组" Classes="section" FontSize="14"/>
                 <TextBlock Text="以下模组声明了必装的依赖，但当前 mods 目录中缺少对应模组，启动时可能报错。可用「模组下载」搜索安装。" Classes="label" TextWrapping="Wrap"/>

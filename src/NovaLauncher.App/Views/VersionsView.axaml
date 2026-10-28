@@ -10,7 +10,7 @@
             <TextBlock Text="{Binding Status}" Classes="status" TextWrapping="Wrap"/>
 
             <!-- 本地版本 -->
-            <Border Background="#222336" CornerRadius="14" Padding="18">
+            <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="12">
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock Text="本地已安装版本" Classes="label" VerticalAlignment="Center"/>
@@ -34,7 +34,7 @@
             </Border>
 
             <!-- 版本迁移 -->
-            <Border Background="#222336" CornerRadius="14" Padding="18">
+            <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="12">
                     <TextBlock Text="版本迁移（搬到新隔离实例）" Classes="label"/>
                     <TextBlock Text="把源版本的内容复制到目标版本。适用于：为新版本开启隔离后，把旧实例的模组/资源包/光影迁移过去。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
@@ -61,7 +61,7 @@
             </Border>
 
             <!-- 官方版本下载 -->
-            <Border Background="#222336" CornerRadius="14" Padding="18">
+            <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="12">
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                         <TextBlock Grid.Column="0" Text="官方版本下载" Classes="label" VerticalAlignment="Center"/>
@@ -87,12 +87,12 @@
             </Border>
 
             <!-- 加载器安装 -->
-            <Border Background="#222336" CornerRadius="14" Padding="18">
+            <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="14">
                     <TextBlock Text="加载器安装" Classes="label"/>
 
                     <!-- Fabric -->
-                    <Border Background="#1C1D2E" CornerRadius="10" Padding="14">
+                    <Border Background="#F5F6F8" CornerRadius="10" Padding="14">
                         <StackPanel Spacing="10">
                             <TextBlock Text="Fabric" FontWeight="Bold"/>
                             <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
@@ -108,7 +108,7 @@
                     </Border>
 
                     <!-- Forge -->
-                    <Border Background="#1C1D2E" CornerRadius="10" Padding="14">
+                    <Border Background="#F5F6F8" CornerRadius="10" Padding="14">
                         <StackPanel Spacing="10">
                             <TextBlock Text="Forge" FontWeight="Bold"/>
                             <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
@@ -121,7 +121,7 @@
                     </Border>
 
                     <!-- Quilt -->
-                    <Border Background="#1C1D2E" CornerRadius="10" Padding="14">
+                    <Border Background="#F5F6F8" CornerRadius="10" Padding="14">
                         <StackPanel Spacing="10">
                             <TextBlock Text="Quilt" FontWeight="Bold"/>
                             <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
@@ -136,7 +136,7 @@
                     </Border>
 
                     <!-- NeoForge -->
-                    <Border Background="#1C1D2E" CornerRadius="10" Padding="14">
+                    <Border Background="#F5F6F8" CornerRadius="10" Padding="14">
                         <StackPanel Spacing="10">
                             <TextBlock Text="NeoForge" FontWeight="Bold"/>
                             <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
@@ -153,7 +153,7 @@
             </Border>
 
             <!-- 进度 -->
-            <Border IsVisible="{Binding ShowProgress}" Background="#222336" CornerRadius="14" Padding="18">
+            <Border IsVisible="{Binding ShowProgress}" Background="#FFFFFF" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="8">
                     <ProgressBar Minimum="0" Maximum="{Binding ProgressMax}" Value="{Binding ProgressValue}" Height="10"/>
                     <TextBlock Text="{Binding ProgressText}" Classes="status" FontSize="11" TextWrapping="Wrap"/>

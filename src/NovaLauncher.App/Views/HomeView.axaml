@@ -8,8 +8,8 @@
 
             <!-- 页面标题 -->
             <StackPanel Spacing="2">
-                <TextBlock Text="主页" FontSize="26" FontWeight="Bold" Foreground="#E8EAF6"/>
-                <TextBlock Text="管理你的账户与启动配置" FontSize="12" Foreground="#5C6080"/>
+                <TextBlock Text="主页" FontSize="26" FontWeight="Bold" Foreground="#212121"/>
+                <TextBlock Text="管理你的账户与启动配置" FontSize="12" Foreground="#9E9E9E"/>
             </StackPanel>
 
             <!-- 账户卡片（PCL 浮现动效） -->
@@ -25,12 +25,12 @@
                             <TextBlock Text="👤" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center" Spacing="2">
-                            <TextBlock Text="{Binding AccountName, FallbackValue='未登录'}" FontSize="18" FontWeight="SemiBold" Foreground="#E8EAF6"/>
+                            <TextBlock Text="{Binding AccountName, FallbackValue='未登录'}" FontSize="18" FontWeight="SemiBold" Foreground="#212121"/>
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Border Background="#E0E2F5" CornerRadius="6" Padding="8,2">
-                                    <TextBlock Text="{Binding AccountType, FallbackValue='离线'}" FontSize="11" Foreground="#7C4DFF"/>
+                                    <TextBlock Text="{Binding AccountType, FallbackValue='离线'}" FontSize="11" Foreground="#1976D2"/>
                                 </Border>
-                                <TextBlock Text="{Binding Status}" FontSize="11" Foreground="#69F0AE" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Status}" FontSize="11" Foreground="#43A047" VerticalAlignment="Center"/>
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>
@@ -45,10 +45,10 @@
                     </StackPanel>
 
                     <!-- 外置登录面板 -->
-                    <Border IsVisible="{Binding ShowExternalPanel}" Background="#1C1D2E" CornerRadius="14" Padding="14"
+                    <Border IsVisible="{Binding ShowExternalPanel}" Background="#F5F6F8" CornerRadius="14" Padding="14"
                             BorderBrush="#D8DBE8" BorderThickness="1">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="第三方认证服务器登录（外置登录）" FontSize="13" FontWeight="SemiBold" Foreground="#9AA0B8"/>
+                            <TextBlock Text="第三方认证服务器登录（外置登录）" FontSize="13" FontWeight="SemiBold" Foreground="#616161"/>
                             <TextBox Text="{Binding ExternalApi}" PlaceholderText="认证服务器 API，如 https://littleskin.cn/api/yggdrasil"/>
                             <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
                                 <TextBox Grid.Column="0" Text="{Binding ExternalUser}" PlaceholderText="账号 / 邮箱"/>
@@ -56,7 +56,7 @@
                                 <Button Grid.Column="2" Content="登录" Classes="accent" Command="{Binding ExternalLoginCommand}"/>
                             </Grid>
                             <TextBlock Text="通过 authlib-injector 使用第三方皮肤站账号登录，可进入开启正版验证的服务器。"
-                                       FontSize="11" Foreground="#5C6080" TextWrapping="Wrap"/>
+                                       FontSize="11" Foreground="#9E9E9E" TextWrapping="Wrap"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
@@ -68,15 +68,15 @@
                     <TranslateTransform Y="18"/>
                 </Border.RenderTransform>
                 <StackPanel Spacing="16">
-                    <TextBlock Text="启动配置" FontSize="18" FontWeight="SemiBold" Foreground="#E8EAF6"/>
+                    <TextBlock Text="启动配置" FontSize="18" FontWeight="SemiBold" Foreground="#212121"/>
 
                     <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="14" RowSpacing="14">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="游戏版本" VerticalAlignment="Center" FontSize="13" Foreground="#9AA0B8"/>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="游戏版本" VerticalAlignment="Center" FontSize="13" Foreground="#616161"/>
                         <ComboBox Grid.Row="0" Grid.Column="1"
                                   ItemsSource="{Binding Versions}"
                                   SelectedItem="{Binding SelectedVersion}"/>
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Java 运行时" VerticalAlignment="Center" FontSize="13" Foreground="#9AA0B8"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Java 运行时" VerticalAlignment="Center" FontSize="13" Foreground="#616161"/>
                         <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,Auto" ColumnSpacing="8">
                             <ComboBox ItemsSource="{Binding JavaList}"
                                       SelectedItem="{Binding SelectedJava}"
@@ -91,10 +91,10 @@
                                     Command="{Binding DownloadJavaCommand}"/>
                         </Grid>
 
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="内存 (MB)" VerticalAlignment="Center" FontSize="13" Foreground="#9AA0B8"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="内存 (MB)" VerticalAlignment="Center" FontSize="13" Foreground="#616161"/>
                         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Spacing="10">
                             <TextBox Text="{Binding MinMemoryMb}" Width="130" PlaceholderText="最小"/>
-                            <TextBlock Text="—" VerticalAlignment="Center" Foreground="#5C6080"/>
+                            <TextBlock Text="—" VerticalAlignment="Center" Foreground="#9E9E9E"/>
                             <TextBox Text="{Binding MaxMemoryMb}" Width="130" PlaceholderText="最大"/>
                         </StackPanel>
                     </Grid>
@@ -120,27 +120,27 @@
                     <TranslateTransform Y="18"/>
                 </Border.RenderTransform>
                 <StackPanel Spacing="10">
-                    <TextBlock Text="下载进度" FontSize="14" FontWeight="SemiBold" Foreground="#E8EAF6"/>
+                    <TextBlock Text="下载进度" FontSize="14" FontWeight="SemiBold" Foreground="#212121"/>
                     <ProgressBar Minimum="0" Maximum="{Binding ProgressMax}" Value="{Binding ProgressValue}"/>
-                    <TextBlock Text="{Binding ProgressText}" FontSize="12" Foreground="#9AA0B8" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding ProgressText}" FontSize="12" Foreground="#616161" TextWrapping="Wrap"/>
                 </StackPanel>
             </Border>
 
             <!-- 崩溃分析卡片 -->
-            <Border x:Name="CrashCard" IsVisible="{Binding ShowCrashAnalysis}" Classes="card" BorderBrush="#FF6E6E" BorderThickness="1" Opacity="0">
+            <Border x:Name="CrashCard" IsVisible="{Binding ShowCrashAnalysis}" Classes="card" BorderBrush="#E53935" BorderThickness="1" Opacity="0">
                 <Border.RenderTransform>
                     <TranslateTransform Y="18"/>
                 </Border.RenderTransform>
                 <StackPanel Spacing="10">
-                    <TextBlock Text="💥 游戏崩溃分析" FontSize="15" FontWeight="Bold" Foreground="#FF8A8A"/>
+                    <TextBlock Text="💥 游戏崩溃分析" FontSize="15" FontWeight="Bold" Foreground="#E53935"/>
                     <TextBlock Text="{Binding CrashAnalysisResult.Reason}" FontSize="14" FontWeight="SemiBold"
-                               Foreground="#E8EAF6" TextWrapping="Wrap"/>
-                    <TextBlock Text="{Binding CrashAnalysisResult.Detail}" FontSize="11" Foreground="#9AA0B8"
+                               Foreground="#212121" TextWrapping="Wrap"/>
+                    <TextBlock Text="{Binding CrashAnalysisResult.Detail}" FontSize="11" Foreground="#616161"
                                TextWrapping="Wrap" FontFamily="Consolas, monospace"/>
-                    <TextBlock Text="{Binding CrashAnalysisResult.Suggestion}" FontSize="12" Foreground="#69F0AE"
+                    <TextBlock Text="{Binding CrashAnalysisResult.Suggestion}" FontSize="12" Foreground="#43A047"
                                TextWrapping="Wrap"/>
                     <TextBlock IsVisible="{Binding ShowCrashLogTail}"
-                               Text="{Binding CrashAnalysisResult.LogTail}" FontSize="11" Foreground="#5C6080"
+                               Text="{Binding CrashAnalysisResult.LogTail}" FontSize="11" Foreground="#9E9E9E"
                                MaxHeight="140" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
                                FontFamily="Consolas, monospace"/>
                 </StackPanel>
@@ -152,7 +152,7 @@
                     <TranslateTransform Y="18"/>
                 </Border.RenderTransform>
                 <StackPanel Spacing="10">
-                    <TextBlock Text="游戏 / 启动日志" FontSize="14" FontWeight="SemiBold" Foreground="#E8EAF6"/>
+                    <TextBlock Text="游戏 / 启动日志" FontSize="14" FontWeight="SemiBold" Foreground="#212121"/>
                     <TextBox Text="{Binding GameLog}" Height="200" IsReadOnly="True"
                              TextWrapping="Wrap" AcceptsReturn="True"
                              FontFamily="Consolas, monospace" FontSize="11"/>

@@ -8,7 +8,7 @@
         <TextBlock Text="管理 Minecraft 存档（世界）：导入/导出 ZIP、备份与恢复、打开存档文件夹。存档存放于游戏目录 saves/ 下。" Classes="status"/>
         <TextBlock Text="{Binding Status}" Classes="status"/>
 
-        <Border Background="#222336" CornerRadius="14" Padding="18">
+        <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
             <StackPanel Spacing="12">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                     <TextBlock Grid.Column="0" Text="本地存档列表" Classes="label" VerticalAlignment="Center"/>
@@ -48,7 +48,7 @@
             </StackPanel>
         </Border>
 
-        <Border Background="#222336" CornerRadius="14" Padding="18">
+        <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
             <StackPanel Spacing="12">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
                     <TextBlock Grid.Column="0" Text="备份与恢复" Classes="label" VerticalAlignment="Center"/>
