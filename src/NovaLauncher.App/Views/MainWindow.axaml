@@ -8,8 +8,7 @@
         x:DataType="vm:MainViewModel"
         Width="1200" Height="780" MinWidth="1020" MinHeight="640"
         WindowStartupLocation="CenterScreen"
-        Title="NovaLauncher · Minecraft 第三方启动器"
-        Background="#F2F3F5">
+        Title="NovaLauncher · Minecraft 第三方启动器">
 
     <Window.Styles>
         <Style Selector="ListBoxItem.navitem">
@@ -27,20 +26,24 @@
         </Style>
     </Window.Styles>
 
+    <!-- 整体背景：MC 高清风景图 -->
+    <Window.Background>
+        <ImageBrush Source="avares://NovaLauncher/Assets/mc_bg.png" Stretch="UniformToFill"/>
+    </Window.Background>
+
     <DockPanel>
-        <!-- 左侧导航栏（HMCL 白色） -->
-        <Border DockPanel.Dock="Left" Width="210" Background="White"
-                BorderBrush="#E4E6EA" BorderThickness="0,0,1,0">
+        <!-- 左侧导航栏：半透明白色（MC 背景透出来） -->
+        <Border DockPanel.Dock="Left" Width="210" Background="#D9FFFFFF">
             <DockPanel>
                 <!-- Logo 区域 -->
-                <Border DockPanel.Dock="Top" Padding="20,24,20,18" Background="White">
+                <Border DockPanel.Dock="Top" Padding="20,24,20,18" Background="#F2FFFFFF">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <Border Width="38" Height="38" CornerRadius="8" Background="#1976D2" VerticalAlignment="Center">
                             <TextBlock Text="🎮" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="NovaLauncher" FontSize="17" FontWeight="Bold" Foreground="#212121"/>
-                            <TextBlock Text="Minecraft 启动器" FontSize="10" Foreground="#9E9E9E"/>
+                            <TextBlock Text="Minecraft 启动器" FontSize="10" Foreground="#616161"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -48,8 +51,8 @@
                 <!-- 底部信息 -->
                 <Border DockPanel.Dock="Bottom" Padding="16,12">
                     <StackPanel Spacing="2">
-                        <TextBlock Text="{Binding CurrentVersionText}" FontSize="10" Foreground="#9E9E9E"/>
-                        <TextBlock Text="跨平台 · C# / Avalonia" FontSize="9" Foreground="#BDBDBD"/>
+                        <TextBlock Text="{Binding CurrentVersionText}" FontSize="10" Foreground="#616161"/>
+                        <TextBlock Text="跨平台 · C# / Avalonia" FontSize="9" Foreground="#9E9E9E"/>
                     </StackPanel>
                 </Border>
 
@@ -76,12 +79,12 @@
                                         Background="#1976D2" Margin="0,8,0,8"
                                         IsVisible="{Binding $parent[ListBoxItem].IsSelected}"/>
                                 <Border Grid.Column="1" Width="32" Height="32" CornerRadius="6"
-                                        Background="#F0F1F3" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        Background="#E8FFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <TextBlock Text="{Binding Icon}" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Grid.Column="2" Text="{Binding Title}" FontSize="14"
                                            VerticalAlignment="Center" Margin="6,0,0,0"
-                                           Foreground="#424242"/>
+                                           Foreground="#212121"/>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -89,8 +92,8 @@
             </DockPanel>
         </Border>
 
-        <!-- 右侧内容区 -->
-        <Border Background="#F2F3F5">
+        <!-- 右侧内容区：半透明白色遮罩（MC 背景透出来） -->
+        <Border Background="#B3FFFFFF">
             <DockPanel>
                 <!-- 更新提示条 -->
                 <Border DockPanel.Dock="Top" Background="#E3F2FD" CornerRadius="0" Padding="16,10"
