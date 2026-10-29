@@ -19,6 +19,9 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] private string microsoftClientId;
     [ObservableProperty] private string curseForgeApiKey;
     [ObservableProperty] private bool versionIsolation;
+    [ObservableProperty] private int backgroundOpacity = 70;
+    [ObservableProperty] private int cardOpacity = 95;
+    [ObservableProperty] private bool liquidGlassMode = false;
     [ObservableProperty] private string status = "";
 
     public ObservableCollection<string> DownloadMirrors { get; } = new() { "官方海外源", "大陆源（已关闭）" };
@@ -48,6 +51,9 @@ public partial class SettingsViewModel : ViewModelBase
         MicrosoftClientId = c.MicrosoftClientId;
         CurseForgeApiKey = c.CurseForgeApiKey;
         DownloadMirror = c.DownloadMirror;
+        BackgroundOpacity = c.BackgroundOpacity;
+        CardOpacity = c.CardOpacity;
+        LiquidGlassMode = c.LiquidGlassMode;
         VersionIsolation = c.VersionIsolation;
     }
 
@@ -66,6 +72,9 @@ public partial class SettingsViewModel : ViewModelBase
         c.MicrosoftClientId = MicrosoftClientId.Trim();
         c.CurseForgeApiKey = CurseForgeApiKey.Trim();
         c.VersionIsolation = VersionIsolation;
+        c.BackgroundOpacity = Math.Clamp(BackgroundOpacity, 0, 100);
+        c.CardOpacity = Math.Clamp(CardOpacity, 0, 100);
+        c.LiquidGlassMode = LiquidGlassMode;
         // 大陆下载源已按法律合规关闭，始终使用官方海外源
         c.DownloadMirror = 0;
         AppServices.SaveConfig();

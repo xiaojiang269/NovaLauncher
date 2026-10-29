@@ -51,6 +51,15 @@ public sealed class LauncherConfig
     /// <summary>下载镜像源（0=官方，1=BMCLAPI）。</summary>
     public int DownloadMirror { get; set; }
 
+    /// <summary>背景图遮罩透明度（0-100，值越小背景越透）。</summary>
+    public int BackgroundOpacity { get; set; } = 70;
+
+    /// <summary>卡片透明度（0-100，值越大卡片越实）。</summary>
+    public int CardOpacity { get; set; } = 95;
+
+    /// <summary>液态玻璃模式（毛玻璃半透明效果）。</summary>
+    public bool LiquidGlassMode { get; set; } = false;
+
     /// <summary>微软登录 ClientId（为空则不启用微软登录）。</summary>
     public string MicrosoftClientId { get; set; } = "";
 

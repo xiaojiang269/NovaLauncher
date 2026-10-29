@@ -8,7 +8,10 @@
         x:DataType="vm:MainViewModel"
         Width="1200" Height="780" MinWidth="1020" MinHeight="640"
         WindowStartupLocation="CenterScreen"
-        Title="NovaLauncher · Minecraft 第三方启动器">
+        WindowDecorations="None"
+        TransparencyLevelHint="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        Title="NovaLauncher">
 
     <Window.Styles>
         <Style Selector="ListBoxItem.navitem">
@@ -26,17 +29,34 @@
         </Style>
     </Window.Styles>
 
-    <!-- 整体背景：MC 高清风景图 -->
+    <!-- 整体背景：MC 高清风景图，全屏覆盖 -->
     <Window.Background>
         <ImageBrush Source="avares://NovaLauncher/Assets/mc_bg.png" Stretch="UniformToFill"/>
     </Window.Background>
 
     <DockPanel>
+        <!-- 自定义标题栏（顶部拖动 + 窗口控制按钮） -->
+        <Border DockPanel.Dock="Top" Height="38" Background="#33FFFFFF" PointerPressed="TitleBar_PointerPressed">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <TextBlock Grid.Column="0" Text="NovaLauncher · Minecraft 第三方启动器"
+                           FontSize="12" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                <Button Grid.Column="1" x:Name="MinBtn" Content="—" FontSize="14" Width="46" Height="38"
+                        Background="Transparent" Foreground="#FFFFFF" BorderThickness="0"
+                        Click="MinBtn_Click" VerticalAlignment="Center"/>
+                <Button Grid.Column="2" x:Name="MaxBtn" Content="□" FontSize="12" Width="46" Height="38"
+                        Background="Transparent" Foreground="#FFFFFF" BorderThickness="0"
+                        Click="MaxBtn_Click" VerticalAlignment="Center"/>
+                <Button Grid.Column="3" x:Name="CloseBtn" Content="✕" FontSize="13" Width="46" Height="38"
+                        Background="Transparent" Foreground="#FFFFFF" BorderThickness="0"
+                        Click="CloseBtn_Click" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
         <!-- 左侧导航栏：半透明白色（MC 背景透出来） -->
-        <Border DockPanel.Dock="Left" Width="210" Background="#D9FFFFFF">
+        <Border x:Name="NavPanel" DockPanel.Dock="Left" Width="210" Background="#D9FFFFFF">
             <DockPanel>
                 <!-- Logo 区域 -->
-                <Border DockPanel.Dock="Top" Padding="20,24,20,18" Background="#F2FFFFFF">
+                <Border DockPanel.Dock="Top" Padding="20,20,20,16" Background="#F2FFFFFF">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <Border Width="38" Height="38" CornerRadius="8" Background="#1976D2" VerticalAlignment="Center">
                             <TextBlock Text="🎮" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -93,7 +113,7 @@
         </Border>
 
         <!-- 右侧内容区：半透明白色遮罩（MC 背景透出来） -->
-        <Border Background="#B3FFFFFF">
+        <Border x:Name="ContentPanel" Background="#B3FFFFFF">
             <DockPanel>
                 <!-- 更新提示条 -->
                 <Border DockPanel.Dock="Top" Background="#E3F2FD" CornerRadius="0" Padding="16,10"

@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:NovaLauncher.App.ViewModels"
+             x:Class="NovaLauncher.App.Views.MoreView"
+             x:DataType="vm:MoreViewModel">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Spacing="18" MaxWidth="880" Margin="28,24">
+            <TextBlock Text="更多" FontSize="26" FontWeight="Bold" Foreground="#212121"/>
+            <TextBlock Text="小工具与彩蛋" FontSize="12" Foreground="#9E9E9E"/>
+
+            <!-- 今日人品卡片 -->
+            <Border Classes="card">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="🎲 今日人品" FontSize="18" FontWeight="SemiBold" Foreground="#212121"/>
+                    <TextBlock Text="{Binding TodayLuck}" FontSize="48" FontWeight="Bold" Foreground="#1976D2" HorizontalAlignment="Center"/>
+                    <TextBlock Text="/ 100" FontSize="14" Foreground="#9E9E9E" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding LuckText}" FontSize="14" Foreground="#616161" HorizontalAlignment="Center" TextWrapping="Wrap"/>
+                    <Button Content="🔄 重新ROLL" Classes="flat" Command="{Binding RollLuckCommand}" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 千万别点卡片 -->
+            <Border Classes="card">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="⚠️ 千万别点" FontSize="18" FontWeight="SemiBold" Foreground="#E53935"/>
+                    <TextBlock Text="这个按钮真的不能点！点了会出事！" FontSize="13" Foreground="#616161" TextWrapping="Wrap"/>
+                    <Button Content="🙅 我就不点" FontSize="16" FontWeight="Bold"
+                            Background="#FFCDD2" Foreground="#C62828"
+                            CornerRadius="12" Padding="40,14"
+                            Command="{Binding DontClickCommand}"
+                            HorizontalAlignment="Center" Cursor="Hand"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 关于卡片 -->
+            <Border Classes="card">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="ℹ️ 关于" FontSize="18" FontWeight="SemiBold" Foreground="#212121"/>
+                    <TextBlock Text="NovaLauncher v3.2.1" FontSize="13" Foreground="#616161"/>
+                    <TextBlock Text="Minecraft 第三方启动器 · C# / Avalonia 跨平台" FontSize="12" Foreground="#9E9E9E"/>
+                    <TextBlock Text="致敬 PCL2 风格" FontSize="12" Foreground="#9E9E9E"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

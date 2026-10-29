@@ -54,6 +54,28 @@
                 </StackPanel>
             </Border>
 
+            <!-- 外观设置 -->
+            <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="外观设置" Classes="label"/>
+                    <Grid ColumnDefinitions="100,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="14" RowSpacing="12">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="背景透明度" VerticalAlignment="Center" FontSize="13"/>
+                        <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="100"
+                                Value="{Binding BackgroundOpacity, Mode=TwoWay}"
+                                VerticalAlignment="Center" Width="200"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="卡片透明度" VerticalAlignment="Center" FontSize="13"/>
+                        <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="100"
+                                Value="{Binding CardOpacity, Mode=TwoWay}"
+                                VerticalAlignment="Center" Width="200"/>
+                        <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                  Content="液态玻璃模式（毛玻璃半透明效果，类似 iOS）"
+                                  IsChecked="{Binding LiquidGlassMode, Mode=TwoWay}"
+                                  VerticalAlignment="Center"/>
+                    </Grid>
+                    <TextBlock Text="拖动滑块调整背景图和卡片的透明度，保存后重启生效。" Classes="label" FontSize="11" TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+
             <Border Background="#FFFFFF" CornerRadius="14" Padding="18">
                 <StackPanel Spacing="10">
                     <TextBlock Text="微软登录（可选）" Classes="label"/>

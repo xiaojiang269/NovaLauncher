@@ -42,6 +42,7 @@ public partial class MainViewModel : ViewModelBase
             new("资源与光影", "🎨", new ResourceViewModel()),
             new("联机", "🔗", new LanPlayViewModel()),
             new("服务器", "🖥️", new ServersViewModel()),
+            new("更多", "🎯", new MoreViewModel()),
             new("设置", "⚙️", new SettingsViewModel()),
         };
         SelectedNav = Pages[0];
