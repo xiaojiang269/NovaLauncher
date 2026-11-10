@@ -9,7 +9,7 @@ namespace NovaLauncher.Core.Services;
 public static class AppVersion
 {
     /// <summary>当前版本号（与 GitHub Release tag 对应，不带 v 前缀）。</summary>
-    public const string Current = "3.2.1";
+    public const string Current = "3.2.2";
 
     public static string Tag => "v" + Current;
 }
@@ -65,16 +65,27 @@ public sealed class UpdateService
             var version = tag.TrimStart('v', 'V');
             var assetUrl = "";
             var assetName = "";
-            var target = TargetAssetSuffix();
+            var targets = TargetAssetSuffixes();
             if (assets.ValueKind == JsonValueKind.Array)
             {
+                var best = -1;
                 foreach (var item in assets.EnumerateArray())
                 {
                     var name = item.TryGetProperty("name", out var n) ? n.GetString() : "";
-                    if (string.IsNullOrEmpty(name) || !name.Contains(target, StringComparison.OrdinalIgnoreCase)) continue;
+                    if (string.IsNullOrEmpty(name)) continue;
+                    // 只接受 .zip 包
+                    if (!name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase)) continue;
+                    // 平台/架构必须命中任一别名
+                    var hit = false;
+                    foreach (var suffix in targets)
+                        if (name.Contains(suffix, StringComparison.OrdinalIgnoreCase)) { hit = true; break; }
+                    if (!hit) continue;
+                    // 优先完整包（非单文件版），避免更新后丢失依赖
+                    var score = name.Contains("单文件", StringComparison.OrdinalIgnoreCase) ? 0 : 10;
+                    if (score <= best) continue;
+                    best = score;
                     if (item.TryGetProperty("browser_download_url", out var u)) assetUrl = u.GetString() ?? "";
                     assetName = name;
-                    break;
                 }
             }
 
@@ -154,16 +165,18 @@ public sealed class UpdateService
         return null;
     }
 
-    /// <summary>目标平台在 asset 文件名中的后缀片段。</summary>
-    private static string TargetAssetSuffix()
+    /// <summary>目标平台在 asset 文件名中可能的后缀片段（兼容 win-x64 / Windows-x64 等命名）。</summary>
+    private static string[] TargetAssetSuffixes()
     {
         var os = Platform.CurrentOs;
         var arch = RuntimeInformation.ProcessArchitecture;
-        if (os == Platform.OsType.Windows) return "Windows-x64";
-        if (os == Platform.OsType.Linux) return "Linux-x64";
+        if (os == Platform.OsType.Windows) return new[] { "Windows-x64", "win-x64", "windows-x64" };
+        if (os == Platform.OsType.Linux) return new[] { "Linux-x64", "linux-x64" };
         if (os == Platform.OsType.MacOs)
-            return arch == Architecture.Arm64 ? "macOS-arm64" : "macOS-x64";
-        return "Linux-x64";
+            return arch == Architecture.Arm64
+                ? new[] { "macOS-arm64", "macos-arm64", "osx-arm64" }
+                : new[] { "macOS-x64", "macos-x64", "osx-x64" };
+        return new[] { "Linux-x64", "linux-x64" };
     }
 
     /// <summary>写替换脚本：等待原进程退出，把包内文件覆盖到程序目录，再重启。返回脚本路径。</summary>
