@@ -1,4 +1,4 @@
-const CACHE = 'nova-mobile-v3.3.0';
+const CACHE = 'nova-mobile-v3.3.0-ls1';
 const FILES = ['./', './index.html', './manifest.json', './assets/mc_bg.png', './assets/icon-192.png', './assets/icon-512.png'];
 
 self.addEventListener('install', e => {
