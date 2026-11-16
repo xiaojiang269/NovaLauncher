@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#1b5faa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NovaLauncher">
+<meta name="mobile-web-app-capable" content="yes">
+<title>NovaLauncher 手机版</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;width:100%;max-width:100vw;overflow-x:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans SC","Noto Sans SC",sans-serif;
+  color:#1a1a1a;overflow:hidden;
+  background:#0d1b2a url(assets/mc_bg.png) center/cover no-repeat fixed;
+  -webkit-user-select:none;user-select:none;
+}
+#veil{position:fixed;inset:0;background:rgba(255,255,255,var(--veil,.72));backdrop-filter:blur(var(--blur,0px));-webkit-backdrop-filter:blur(var(--blur,0px));transition:background .25s,backdrop-filter .25s;pointer-events:none}
+#app{position:relative;height:100%;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+
+/* 顶栏 */
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.55)}
+.logo{width:34px;height:34px;border-radius:10px;background:#1b5faa;display:grid;place-items:center;font-size:18px;box-shadow:0 4px 12px rgba(27,95,170,.35)}
+.tt{flex:1;min-width:0}
+.tt b{display:block;font-size:15px;letter-spacing:.2px}
+.tt span{font-size:10px;color:#4a5560}
+.upd{font-size:11px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.72);color:#1b5faa;font-weight:600;white-space:nowrap}
+.upd.new{background:#1b5faa;color:#fff;border-color:#1b5faa;animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(27,95,170,.5)}50%{box-shadow:0 0 0 8px rgba(27,95,170,0)}}
+
+/* 页面区 */
+main{flex:1;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(76px + env(safe-area-inset-bottom))}
+.page{display:none;animation:fade .22s ease}
+.page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+*{max-width:100%}
+.card{background:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 6px 20px rgba(20,40,70,.10)}
+.card h3{margin:0 0 10px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;color:#1b2a3a}
+.card h3 i{font-style:normal}
+.hint{font-size:11px;color:#6b7785;line-height:1.6}
+
+/* 表单 */
+.row{display:flex;align-items:center;gap:10px;padding:9px 0}
+.row+.row{border-top:1px dashed rgba(0,0,0,.07)}
+.row .k{flex:1;font-size:12.5px}
+.row .v{font-size:11.5px;color:#6b7785}
+input[type=text],select{width:100%;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid #d8dee6;background:#fff;font-size:13px;outline:none;font-family:inherit}
+input[type=text]:focus,select:focus{border-color:#1b5faa;box-shadow:0 0 0 3px rgba(27,95,170,.12)}
+input[type=range]{-webkit-appearance:none;width:150px;height:26px;background:transparent}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:#cfd8e3}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#1b5faa;margin-top:-8px;box-shadow:0 2px 6px rgba(27,95,170,.4)}
+
+/* 开关 */
+.sw{position:relative;width:48px;height:28px;border-radius:999px;background:#cfd8e3;transition:.2s;flex:none}
+.sw.on{background:#1b5faa}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.sw.on::after{left:23px}
+
+/* 按钮 */
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:12px;font-size:14px;font-weight:700;font-family:inherit;background:#1b5faa;color:#fff;box-shadow:0 6px 16px rgba(27,95,170,.28);transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.green{background:#3ba55d;box-shadow:0 6px 16px rgba(59,165,93,.3)}
+.btn.ghost{background:rgba(255,255,255,.9);color:#1b5faa;border:1px solid #cfe0f3;box-shadow:none}
+.btn.danger{background:#e5484d}
+.btn.sm{padding:8px 12px;width:auto;display:inline-block;font-size:12px;border-radius:9px}
+
+/* 版本/模组列表 */
+.item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;background:rgba(247,250,253,.95);border:1px solid rgba(0,0,0,.05);margin-bottom:8px}
+.item .ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:#e8f1fb;flex:none}
+.item .mid{flex:1;min-width:0}
+.item .mid b{display:block;font-size:12.5px}
+.item .mid span{font-size:10.5px;color:#6b7785}
+.item .act{font-size:11.5px;color:#1b5faa;font-weight:600;white-space:nowrap}
+.item.sel{background:#e8f1fb;border-color:#bcd8f6}
+
+/* 日志 */
+#log{background:rgba(13,27,42,.9);color:#c8e6c9;font:11px/1.7 ui-monospace,Menlo,monospace;border-radius:12px;padding:10px;max-height:140px;overflow-y:auto;white-space:pre-wrap}
+
+/* 底栏 */
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;pad:0;background:rgba(255,255,255,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.9);padding-bottom:env(safe-area-inset-bottom)}
+nav a{flex:1;text-align:center;padding:8px 0 9px;text-decoration:none;color:#6b7785;font-size:11px;display:flex;flex-direction:column;gap:3px;transition:.15s}
+nav a em{font-style:normal;font-size:19px;line-height:1}
+nav a.on{color:#1b5faa}
+nav a.on em{transform:translateY(-1px)}
+
+
+/* ============ 横屏布局（主形态） ============ */
+@media (orientation: landscape){
+  #app{padding-top:0;flex-direction:row}
+  header{position:fixed;top:0;left:78px;right:0;height:46px;padding:0 16px;z-index:10;
+    padding-left:calc(16px + env(safe-area-inset-left))}
+  main{position:absolute;top:46px;left:78px;right:0;bottom:0;padding:12px calc(16px + env(safe-area-inset-right)) 12px 16px;
+    display:block}
+  .page.on{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start}
+  .page.on>.card{margin-bottom:0}
+  .page.on>.card.full{grid-column:1/-1}
+  .page.on>.btn{grid-column:1/-1;align-self:start}
+  #log{max-height:104px}
+  nav{top:0;bottom:0;left:0;right:auto;width:78px;flex-direction:column;
+    padding:calc(6px + env(safe-area-inset-top)) 0 8px env(safe-area-inset-left);
+    border-top:none;border-right:1px solid rgba(255,255,255,.9)}
+  nav a{flex:none;padding:11px 0;gap:4px;font-size:10.5px}
+  nav a em{font-size:20px}
+  nav a.on{background:rgba(27,95,170,.10)}
+  #mask{padding:14px}
+  .dlg{max-width:420px}
+  .luck b{font-size:38px}
+  .card{padding:12px}
+  .card h3{margin-bottom:8px;font-size:12.5px}
+  .row{padding:7px 0}
+  .toast{bottom:20px}
+  .card.note{display:none}
+}
+/* 小屏横屏（手机横放）再收紧 */
+@media (orientation: landscape) and (max-height: 430px){
+  header{height:42px}
+  main{top:42px;padding-top:8px}
+  .card{padding:10px;border-radius:13px}
+  .card h3{font-size:12px;margin-bottom:6px}
+  .row{padding:6px 0}
+  .item{padding:9px 10px;margin-bottom:6px}
+  .btn{padding:11px}
+  #log{max-height:86px}
+  .hint{font-size:10.5px}
+}
+
+/* 弹窗 */
+#mask{position:fixed;inset:0;background:rgba(10,18,28,.55);display:none;place-items:center;z-index:50;padding:24px}
+#mask.on{display:grid}
+.dlg{width:100%;max-width:340px;background:#fff;border-radius:18px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.35);animation:pop .22s ease}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.dlg h4{margin:0 0 8px;font-size:15px}
+.dlg p{margin:0 0 14px;font-size:12.5px;line-height:1.7;color:#3d4b5a}
+.dlg .acts{display:flex;gap:8px;flex-wrap:wrap}
+.dlg .acts .btn{flex:1}
+
+/* 今日人品 */
+.luck{text-align:center;padding:6px 0 2px}
+.luck b{font-size:44px;color:#1b5faa;line-height:1}
+.luck small{font-size:11px;color:#8a97a4}
+.luck p{font-size:12px;color:#4a5560;margin:8px 0 0}
+
+/* 未点击彩蛋按钮 */
+#dont{background:#ffe6e8;color:#c62828;border:1px solid #ffc5cb;font-size:15px;padding:15px}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);background:rgba(20,32,46,.92);color:#fff;font-size:12px;padding:9px 15px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;z-index:60;max-width:86%;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<div id="veil"></div>
+<div id="app">
+  <header>
+    <div class="logo">🎮</div>
+    <div class="tt"><b>NovaLauncher</b><span>手机版 · <span id="ver">3.3.0</span></span></div>
+    <button class="upd" id="updBtn">检查更新</button>
+  </header>
+  <main>
+    <!-- 启动 -->
+    <section class="page on" id="p-home">
+      <div class="card">
+        <h3><i>👤</i>账户</h3>
+        <div class="row"><div class="k">玩家名</div></div>
+        <input type="text" id="player" placeholder="输入玩家名（离线账户）" maxlength="16">
+        <div class="row"><div class="k">登录方式</div><div class="v">离线 · 微软 · 外置</div></div>
+      </div>
+      <div class="card">
+        <h3><i>📦</i>当前版本</h3>
+        <div class="row"><div class="k" id="curVer">1.20.1 Forge</div><div class="v" id="curVerSub">就绪</div></div>
+        <div class="row"><div class="k">分配内存</div><div class="v" id="memVal">2048 MB</div></div>
+        <input type="range" id="mem" min="512" max="8192" step="512" value="2048" style="width:100%">
+      </div>
+      <div class="card full">
+        <h3><i>📜</i>启动日志</h3>
+        <div id="log">等待启动…</div>
+      </div>
+      <button class="btn green" id="launch">启动游戏</button>
+      <div class="card full note"><div class="hint" id="mobileNote">手机版为启动器管理端：可管理账户/版本/模组/存档并检查更新，实际渲染由服务端或云游戏节点完成。</div></div>
+    </section>
+
+    <!-- 版本 -->
+    <section class="page" id="p-ver">
+      <div class="card">
+        <h3><i>🧩</i>版本库</h3>
+        <div id="verList"></div>
+      </div>
+      <div class="card">
+        <h3><i>🧱</i>加载器</h3>
+        <div class="row"><div class="k">原生</div><div class="v">Vanilla</div></div>
+        <div class="row"><div class="k">Forge / NeoForge</div><div class="v">可用</div></div>
+        <div class="row"><div class="k">Fabric / Quilt</div><div class="v">可用</div></div>
+      </div>
+    </section>
+
+    <!-- 模组 -->
+    <section class="page" id="p-mod">
+      <div class="card">
+        <h3><i>🔍</i>模组</h3>
+        <input type="text" id="modSearch" placeholder="搜索模组名称…">
+        <div style="height:10px"></div>
+        <div id="modList"></div>
+      </div>
+      <div class="card"><div class="hint">支持一键提取、依赖排序、识别校验与冲突检测。</div></div>
+    </section>
+
+    <!-- 设置 -->
+    <section class="page" id="p-set">
+      <div class="card">
+        <h3><i>🎨</i>外观</h3>
+        <div class="row"><div class="k">背景透明度</div><input type="range" id="opBg" min="0" max="100" value="72"></div>
+        <div class="row"><div class="k">液态玻璃（毛玻璃）</div><div class="sw" id="swGlass"></div></div>
+        <div class="row"><div class="k">深色导航栏</div><div class="sw" id="swDark"></div></div>
+      </div>
+      <div class="card">
+        <h3><i>⚙️</i>启动</h3>
+        <div class="row"><div class="k">版本隔离</div><div class="sw on" id="swIso"></div></div>
+        <div class="row"><div class="k">启动动画</div><div class="sw on" id="swAnim"></div></div>
+        <div class="row"><div class="k">自动检查更新</div><div class="sw on" id="swUpd"></div></div>
+      </div>
+      <div class="card full">
+        <h3><i>📥</i>桌面版</h3>
+        <div class="hint">Windows / macOS 桌面版请前往 GitHub Release 下载，桌面版自带自动更新。</div>
+        <div style="height:10px"></div>
+        <button class="btn ghost sm" id="goPC">打开发布页</button>
+      </div>
+    </section>
+
+    <!-- 更多 -->
+    <section class="page" id="p-more">
+      <div class="card">
+        <h3><i>🎲</i>今日人品</h3>
+        <div class="luck">
+          <b id="luckNum">--</b><small> / 100</small>
+          <p id="luckTxt">正在计算…</p>
+        </div>
+        <div style="height:10px"></div>
+        <button class="btn ghost sm" id="reroll">重新 ROLL</button>
+      </div>
+      <div class="card">
+        <h3 style="color:#c62828"><i>⚠️</i>千万别点</h3>
+        <div class="hint" style="margin-bottom:10px">这个按钮真的不能点！</div>
+        <button class="btn" id="dont">🙅 我就不点</button>
+      </div>
+      <div class="card">
+        <h3><i>ℹ️</i>关于</h3>
+        <div class="row"><div class="k">版本</div><div class="v" id="aboutVer">3.3.0</div></div>
+        <div class="row"><div class="k">形态</div><div class="v">PWA 手机版</div></div>
+        <div class="row"><div class="k">支持</div><div class="v">Android · iOS · HarmonyOS</div></div>
+      </div>
+    </section>
+  </main>
+  <nav>
+    <a href="#home" class="on" data-p="home"><em>🏠</em>启动</a>
+    <a href="#ver" data-p="ver"><em>🧩</em>版本</a>
+    <a href="#mod" data-p="mod"><em>📚</em>模组</a>
+    <a href="#set" data-p="set"><em>⚙️</em>设置</a>
+    <a href="#more" data-p="more"><em>🎯</em>更多</a>
+  </nav>
+</div>
+<div id="mask"><div class="dlg" id="dlg"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const APP_VER='3.3.0';
+const API='https://api.github.com/repos/xiaojiang269/NovaLauncher/releases/latest';
+const REL_PAGE='https://github.com/xiaojiang269/NovaLauncher/releases';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store={
+  get(k,d){try{const v=localStorage.getItem('nl_'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('nl_'+k,JSON.stringify(v))}catch(e){}}
+};
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200)}
+
+/* ---------- 顶栏/导航 ---------- */
+function goPage(name){
+  $$('nav a').forEach(x=>x.classList.toggle('on',x.dataset.p===name));
+  $$('.page').forEach(p=>p.classList.toggle('on',p.id==='p-'+name));
+  $('main').scrollTop=0;
+}
+window.addEventListener('hashchange',()=>{
+  const h=location.hash.replace('#','');
+  if(h&&document.getElementById('p-'+h))goPage(h);
+});
+$$('nav a').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault();
+  $$('nav a').forEach(x=>x.classList.remove('on'));a.classList.add('on');
+  $$('.page').forEach(p=>p.classList.remove('on'));
+  $('#p-'+a.dataset.p).classList.add('on');
+  $('main').scrollTop=0;
+}));
+
+/* ---------- 主题 ---------- */
+function applyTheme(){
+  const bg=store.get('bgOpacity',72), glass=store.get('glass',false), dark=store.get('darkNav',false);
+  document.documentElement.style.setProperty('--veil',(bg/100).toFixed(2));
+  document.documentElement.style.setProperty('--blur',glass?'16px':'0px');
+  $('#opBg').value=bg;
+  $('#swGlass').classList.toggle('on',glass);
+  $('#swDark').classList.toggle('on',dark);
+  document.body.style.filter=dark?'brightness(.94)':'none';
+}
+$('#opBg').addEventListener('input',e=>{store.set('bgOpacity',+e.target.value);applyTheme()});
+$('#swGlass').addEventListener('click',()=>{store.set('glass',!store.get('glass',false));applyTheme();toast(store.get('glass',false)?'液态玻璃已开启':'液态玻璃已关闭')});
+$('#swDark').addEventListener('click',()=>{store.set('darkNav',!store.get('darkNav',false));applyTheme()});
+['swIso','swAnim','swUpd'].forEach(id=>$('#'+id).addEventListener('click',e=>e.currentTarget.classList.toggle('on')));
+
+/* ---------- 账户/启动 ---------- */
+$('#player').value=store.get('player','');
+$('#player').addEventListener('input',e=>store.set('player',e.target.value));
+$('#mem').addEventListener('input',e=>{
+  const mb=+e.target.value;
+  $('#memVal').textContent=mb+' MB';
+  store.set('mem',mb);
+});
+const savedMem=store.get('mem',2048);$('#mem').value=savedMem;$('#memVal').textContent=savedMem+' MB';
+
+const VERS=[
+  {n:'1.20.1',l:'Forge 47.2.0',s:'推荐 · 模组生态最全',tag:'推荐'},
+  {n:'1.21.1',l:'NeoForge 21.1',s:'较新 · 主流整合包支持',tag:'新'},
+  {n:'26.3',l:'Vanilla',s:'最新快照通道',tag:'实验'},
+  {n:'1.12.2',l:'Forge 14.23',s:'经典老版本',tag:'经典'},
+  {n:'1.16.5',l:'Fabric 0.15',s:'轻量 · 生存好用',tag:'稳定'}
+];
+let curVerIdx=store.get('curVerIdx',0);
+
+function renderVers(){
+  const box=$('#verList');box.innerHTML='';
+  VERS.forEach((v,i)=>{
+    const el=document.createElement('div');
+    el.className='item'+(i===curVerIdx?' sel':'');
+    el.innerHTML=`<div class="ic">⛏️</div><div class="mid"><b>${v.n} · ${v.l}</b><span>${v.s}</span></div>
+      <div class="act">${i===curVerIdx?'使用中':'选用'}</div>`;
+    el.addEventListener('click',()=>{
+      curVerIdx=i;store.set('curVerIdx',i);renderVers();syncCurVer();toast('已切换到 '+v.n);
+    });
+    box.appendChild(el);
+  });
+}
+function syncCurVer(){
+  const v=VERS[curVerIdx];
+  $('#curVer').textContent=v.n+' '+v.l.split(' ')[0];
+  $('#curVerSub').textContent='就绪';
+}
+renderVers();syncCurVer();
+
+$('#launch').addEventListener('click',()=>{
+  const name=$('#player').value.trim()||'Steve';
+  const v=VERS[curVerIdx];
+  const log=$('#log');log.textContent='';
+  const lines=[
+    `[${new Date().toLocaleTimeString()}] NovaLauncher 手机版 ${APP_VER}`,
+    `玩家：${name}（离线账户）`,
+    `版本：${v.n} · ${v.l}`,
+    `内存：${$('#mem').value} MB`,
+    '校验资源完整性… OK',
+    '加载模组（依赖排序）… OK',
+    '注入启动参数… OK',
+    '────────────────',
+    '启动器已就绪：请在此管理配置，',
+    '游戏画面请使用桌面版或在云节点运行。'
+  ];
+  let i=0;
+  const tick=setInterval(()=>{
+    if(i>=lines.length){clearInterval(tick);return}
+    log.textContent+=lines[i++]+'\n';log.scrollTop=log.scrollHeight;
+  },260);
+  toast('已按当前配置启动');
+});
+
+/* ---------- 模组 ---------- */
+const MODS=[
+  {n:'Sodium',d:'渲染优化 · 大幅提升帧率',on:true},
+  {n:'Iris Shaders',d:'光影支持 · 兼容 OptiFine 包',on:true},
+  {n:'JEI',d:'物品配方查询',on:true},
+  {n:'Create',d:'机械动力 · 大型科技整合',on:false},
+  {n:'Farmer\'s Delight',d:'农夫乐事 · 料理扩展',on:false},
+  {n:'AppleSkin',d:'饥饿度信息增强',on:true},
+  {n:'Xaero\'s Minimap',d:'小地图 · 路径点',on:true}
+];
+function renderMods(q=''){
+  const box=$('#modList');box.innerHTML='';
+  MODS.filter(m=>m.n.toLowerCase().includes(q.toLowerCase())||m.d.includes(q)).forEach(m=>{
+    const el=document.createElement('div');el.className='item';
+    el.innerHTML=`<div class="ic">🧩</div><div class="mid"><b>${m.n}</b><span>${m.d}</span></div>
+      <div class="sw ${m.on?'on':''}" style="width:42px;height:24px"></div>`;
+    el.querySelector('.sw').style.cssText='width:42px;height:24px';
+    const sw=el.querySelector('.sw');
+    sw.addEventListener('click',()=>{m.on=!m.on;sw.classList.toggle('on',m.on);toast(m.n+(m.on?' 已启用':' 已停用'))});
+    box.appendChild(el);
+  });
+  if(!box.children.length)box.innerHTML='<div class="hint">没有匹配的模组</div>';
+}
+renderMods();
+$('#modSearch').addEventListener('input',e=>renderMods(e.target.value));
+
+/* ---------- 今日人品 ---------- */
+const LUCK=['欧皇附体，今天开箱必出传奇！','运气爆棚，抽卡十连保底金！','运势极佳，打怪掉落翻倍！','小吉，今天挖矿必出钻石！','平平淡淡，适合养老生存。','运势一般，别赌别赌。','小凶，今天小心苦力怕。','大凶，别出门别开创造。','霉运当头，今天适合下线。','绝绝子，今天点啥啥爆炸！'];
+function rollLuck(manual){
+  let seed;
+  const today=new Date();
+  seed=manual?Math.floor(Math.random()*1e9):(today.getFullYear()*10000+(today.getMonth()+1)*100+today.getDate());
+  let x=seed%2147483647;x=(x*1103515245+12345)%2147483647;
+  const v=Math.abs(x)%100+1;
+  $('#luckNum').textContent=v;
+  $('#luckTxt').textContent=LUCK[9-Math.min(9,Math.floor((v-1)/10))];
+  store.set('luck',v);
+}
+rollLuck(false);
+$('#reroll').addEventListener('click',()=>{rollLuck(true);toast('人品已重新计算')});
+
+/* ---------- 千万别点 ---------- */
+const EGGS=['你真的点了？那今天 MC 必炸一次！💥','恭喜你获得「非酋之证」称号！🎭','警告：再点一次，你的存档将变成泥土。🟫','哈哈被骗了吧！PCL2 同款彩蛋~','别点了别点了，再点启动器就变白了。⚪','你发现了隐藏彩蛋！+100 人品值！✨'];
+$('#dont').addEventListener('click',()=>{
+  const txt=EGGS[Math.floor(Math.random()*EGGS.length)];
+  openDlg('警告',`<p>${txt}</p>`,['确定','确定','确定']);
+});
+function openDlg(title,body,acts){
+  const dg=$('#dlg');
+  dg.innerHTML=`<h4>${title}</h4>${body}<div class="acts"></div>`;
+  const box=dg.querySelector('.acts');
+  acts.forEach(a=>{
+    const b=document.createElement('button');b.className='btn sm';b.style.flex='1';b.textContent=a;
+    b.addEventListener('click',()=>$('#mask').classList.remove('on'));
+    box.appendChild(b);
+  });
+  $('#mask').classList.add('on');
+}
+$('#mask').addEventListener('click',e=>{if(e.target.id==='mask')e.currentTarget.classList.remove('on')});
+
+/* ---------- 你 ---------- */
+$('#goPC').addEventListener('click',()=>window.open(REL_PAGE,'_blank'));
+
+/* ---------- 更新检查 ---------- */
+let latest=null;
+async function checkUpdate(silent){
+  const btn=$('#updBtn');btn.textContent='检查中…';
+  try{
+    const r=await fetch(API,{cache:'no-store'});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    latest=d.tag_name;
+    const lv=latest.replace(/^v/,'');
+    if(cmp(lv,APP_VER)>0){
+      btn.textContent='发现 '+latest;btn.classList.add('new');
+      if(!silent){
+        openDlg('发现新版本 '+latest,
+          `<p>${(d.body||'NovaLauncher 新版本').slice(0,160)}</p>
+           <p class="hint">网页版更新会自动生效（下次打开即为新版）；如需桌面版请前往发布页。</p>`,
+          ['立即更新','稍后']);
+        $('#dlg').querySelectorAll('.btn')[0].addEventListener('click',()=>location.reload());
+        $('#dlg').querySelectorAll('.btn')[1].addEventListener('click',()=>$('#mask').classList.remove('on'));
+      }
+    }else{
+      btn.textContent='已是最新';btn.classList.remove('new');
+      if(!silent)toast('已是最新版本 '+APP_VER);
+    }
+  }catch(e){
+    btn.textContent='检查更新';
+    if(!silent)toast('检查更新失败：'+e.message);
+  }
+}
+function cmp(a,b){const x=a.split('.').map(Number),y=b.split('.').map(Number);for(let i=0;i<3;i++){if((x[i]||0)>(y[i]||0))return 1;if((x[i]||0)<(y[i]||0))return -1}return 0}
+$('#updBtn').addEventListener('click',()=>checkUpdate(false));
+
+/* ---------- 离线/更新 ---------- */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(reg=>{
+    reg.addEventListener('updatefound',()=>{
+      const w=reg.installing;
+      w&&w.addEventListener('statechange',()=>{
+        if(w.state==='installed'&&navigator.serviceWorker.controller){
+          toast('新版本已就绪，下次打开自动生效');
+        }
+      });
+    });
+  }).catch(()=>{});
+}
+setTimeout(()=>checkUpdate(true),900);
+applyTheme();
+
+/* 横屏优先：安装为应用后尝试锁定方向 */
+if(screen.orientation && screen.orientation.lock){
+  screen.orientation.lock('landscape').catch(()=>{});
+}
+const initHash=location.hash.replace('#','');
+if(initHash&&document.getElementById('p-'+initHash))goPage(initHash);
+</script>
+</body>
+</html>
