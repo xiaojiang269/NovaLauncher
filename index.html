@@ -266,8 +266,19 @@ nav a.on em{transform:translateY(-1px)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='3.3.0';
+const APP_VER='3.3.1';
 const API='https://api.github.com/repos/xiaojiang269/NovaLauncher/releases/latest';
+const IS_APP=/NovaLauncherApp/.test(navigator.userAgent);
+async function ghJson(url){
+  if(window.NovaBridge&&window.NovaBridge.httpGet){
+    const txt=window.NovaBridge.httpGet(url);
+    if(txt&&txt.indexOf('ERROR:')===0) throw new Error(txt.slice(6));
+    return JSON.parse(txt);
+  }
+  const r=await fetch(url,{cache:'no-store'});
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}
 const REL_PAGE='https://github.com/xiaojiang269/NovaLauncher/releases';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const store={
@@ -441,9 +452,7 @@ let latest=null;
 async function checkUpdate(silent){
   const btn=$('#updBtn');btn.textContent='检查中…';
   try{
-    const r=await fetch(API,{cache:'no-store'});
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const d=await r.json();
+    const d=await ghJson(API);
     latest=d.tag_name;
     const lv=latest.replace(/^v/,'');
     if(cmp(lv,APP_VER)>0){
@@ -453,7 +462,10 @@ async function checkUpdate(silent){
           `<p>${(d.body||'NovaLauncher 新版本').slice(0,160)}</p>
            <p class="hint">网页版更新会自动生效（下次打开即为新版）；如需桌面版请前往发布页。</p>`,
           ['立即更新','稍后']);
-        $('#dlg').querySelectorAll('.btn')[0].addEventListener('click',()=>location.reload());
+        $('#dlg').querySelectorAll('.btn')[0].addEventListener('click',()=>{
+          if(IS_APP){window.open(REL_PAGE,'_blank');$('#mask').classList.remove('on');}
+          else location.reload();
+        });
         $('#dlg').querySelectorAll('.btn')[1].addEventListener('click',()=>$('#mask').classList.remove('on'));
       }
     }else{
