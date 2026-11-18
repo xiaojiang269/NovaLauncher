@@ -15,14 +15,14 @@ public sealed class ModrinthApi
     private static readonly HttpClient Client = Http.Get();
 
     /// <summary>搜索模组。projectType: mod / shader / resourcepack / modpack；loader: fabric / forge / quilt / neoforge / 空为不限。</summary>
-    public async Task<List<ModrinthProject>> SearchAsync(string query, string? gameVersion, string? loader, string? projectType = "mod", int limit = 60, CancellationToken ct = default)
+    public async Task<List<ModrinthProject>> SearchAsync(string query, string? gameVersion, string? loader, string? projectType = "mod", int limit = 60, string index = "relevance", CancellationToken ct = default)
     {
         var facets = new List<string[]>();
         if (!string.IsNullOrWhiteSpace(projectType)) facets.Add(new[] { $"project_type:{projectType.Trim()}" });
         if (!string.IsNullOrWhiteSpace(gameVersion)) facets.Add(new[] { $"versions:{gameVersion.Trim()}" });
         if (!string.IsNullOrWhiteSpace(loader)) facets.Add(new[] { $"categories:{loader.Trim()}" });
 
-        var url = $"{Base}/search?query={Uri.EscapeDataString(query.Trim())}&limit={limit}&index=relevance";
+        var url = $"{Base}/search?query={Uri.EscapeDataString(query.Trim())}&limit={limit}&index={index}";
         if (facets.Count > 0)
             url += $"&facets={Uri.EscapeDataString(JArray.FromObject(facets).ToString(Newtonsoft.Json.Formatting.None))}";
 

@@ -61,6 +61,42 @@ public partial class ModDownloadViewModel : ViewModelBase
     /// <summary>下载目标子目录：模组→mods，光影→shaderpacks，资源包→resourcepacks。</summary>
     private string TargetSubDir => SelectedProjectType switch { "shader" => "shaderpacks", "resourcepack" => "resourcepacks", _ => "mods" };
 
+    /// <summary>进入页面即拉取当前筛选条件下的热门模组，直接在本页展示。</summary>
+    [RelayCommand]
+    private async Task LoadFeaturedAsync()
+    {
+        if (UseCurse && string.IsNullOrWhiteSpace(AppServices.Config.CurseForgeApiKey))
+        {
+            Status = "使用 CurseForge 源需先在“设置”页填写 CurseForge API key。";
+            return;
+        }
+        IsBusy = true;
+        Projects.Clear();
+        Status = "正在拉取热门模组…";
+        try
+        {
+            var loader = SelectedLoader;
+            var gv = GameVersion == "不限" ? null : GameVersion;
+            var items = await _modrinth.SearchAsync("", gv, loader, SelectedProjectType, 30, "downloads");
+            foreach (var i in items)
+                Projects.Add(new ModSearchItem
+                {
+                    Source = "modrinth", ModId = i.Slug, Title = i.Title, Description = i.Description,
+                    Downloads = i.Downloads, IconUrl = i.IconUrl
+                });
+            Status = $"已加载 {Projects.Count} 个热门{SelectedProjectTypeName}（按下载量排序）";
+            if (Projects.Count > 0) SelectedProject = Projects[0];
+        }
+        catch (Exception ex)
+        {
+            Status = "拉取失败：" + ex.Message;
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     [RelayCommand]
     private async Task SearchAsync()
     {
