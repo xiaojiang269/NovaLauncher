@@ -70,6 +70,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .btn.danger{background:#e5484d}
 .btn.sm{padding:8px 12px;width:auto;display:inline-block;font-size:12px;border-radius:9px}
 
+/* 下拉选择 */
+.msel{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:10px;color:#fff;
+ padding:8px 9px;font-size:12px;outline:none;max-width:120px}
+/* 版本筛选条 */
+.vbar{display:flex;gap:8px;align-items:center;margin:6px 0 8px}
+.vbar input[type=text],.vbar input:not([type]){flex:1;min-width:0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+ border-radius:10px;color:#fff;padding:9px 11px;font-size:13px;outline:none}
+.snap{display:flex;align-items:center;gap:5px;font-size:12px;color:#B8C4B8;white-space:nowrap}
+.vmini{font-size:11px;color:#8FA08F;margin:0 0 8px}
 /* 版本/模组列表 */
 .item{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;background:rgba(247,250,253,.95);border:1px solid rgba(0,0,0,.05);margin-bottom:8px}
 .item .ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:#e8f1fb;flex:none}
@@ -187,6 +196,11 @@ nav a.on em{transform:translateY(-1px)}
     <section class="page" id="p-ver">
       <div class="card">
         <h3><i>🧩</i>版本库</h3>
+        <div class="vbar">
+          <input id="verSearch" placeholder="搜索版本号，如 1.20.1" autocomplete="off">
+          <label class="snap"><input type="checkbox" id="showSnap"> 含快照</label>
+        </div>
+        <div id="verInfo" class="vmini">正在读取官方版本清单 …</div>
         <div id="verList"></div>
       </div>
       <div class="card">
@@ -201,7 +215,25 @@ nav a.on em{transform:translateY(-1px)}
     <section class="page" id="p-mod">
       <div class="card">
         <h3><i>🔍</i>模组</h3>
-        <input type="text" id="modSearch" placeholder="搜索模组名称…">
+        <input type="text" id="modSearch" placeholder="搜索本地模组…">
+        <div class="vbar" style="margin-top:8px">
+          <select id="modLoader" class="msel">
+            <option value="">全部加载器</option>
+            <option value="fabric">Fabric</option>
+            <option value="forge">Forge</option>
+            <option value="neoforge">NeoForge</option>
+            <option value="quilt">Quilt</option>
+          </select>
+          <select id="modType" class="msel">
+            <option value="mod">模组</option>
+            <option value="shader">光影</option>
+            <option value="resourcepack">资源包</option>
+            <option value="modpack">整合包</option>
+          </select>
+          <button class="btn ghost sm" id="modOnlineBtn">在线搜索</button>
+        </div>
+        <div id="modHint" class="vmini">源：Modrinth 官方 API · 下载保存到本机 mods 目录</div>
+        <div id="modOnlineList"></div>
         <div style="height:10px"></div>
         <div id="modList"></div>
       </div>
@@ -266,7 +298,7 @@ nav a.on em{transform:translateY(-1px)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='3.3.1';
+const APP_VER='3.4.0';
 const API='https://api.github.com/repos/xiaojiang269/NovaLauncher/releases/latest';
 const IS_APP=/NovaLauncherApp/.test(navigator.userAgent);
 async function ghJson(url){
@@ -331,32 +363,87 @@ $('#mem').addEventListener('input',e=>{
 });
 const savedMem=store.get('mem',2048);$('#mem').value=savedMem;$('#memVal').textContent=savedMem+' MB';
 
-const VERS=[
-  {n:'1.20.1',l:'Forge 47.2.0',s:'推荐 · 模组生态最全',tag:'推荐'},
-  {n:'1.21.1',l:'NeoForge 21.1',s:'较新 · 主流整合包支持',tag:'新'},
-  {n:'26.3',l:'Vanilla',s:'最新快照通道',tag:'实验'},
-  {n:'1.12.2',l:'Forge 14.23',s:'经典老版本',tag:'经典'},
-  {n:'1.16.5',l:'Fabric 0.15',s:'轻量 · 生存好用',tag:'稳定'}
+/* 官方全量版本清单：优先从 App 原生层拉取（含每个版本所需 Java） */
+const FALLBACK_VERS=[
+  {n:'1.20.1',l:'Forge 47.2.0',s:'推荐 · 模组生态最全'},
+  {n:'1.21.1',l:'NeoForge 21.1',s:'较新 · 主流整合包支持'},
+  {n:'26.3',l:'Vanilla',s:'最新正式版'},
+  {n:'1.12.2',l:'Forge 14.23',s:'经典老版本'},
+  {n:'1.16.5',l:'Fabric 0.15',s:'轻量 · 生存好用'}
 ];
+let ALL_VERS=[];           // {id,type,time,java}
 let curVerIdx=store.get('curVerIdx',0);
+let curVerId=store.get('curVerId','1.20.1');
+let filterType=(store.get('verSnap',false)?'all':'release');
+
+function javaTag(j){return j===8?'J8':j===17?'J17':j===21?'J21':'?';}
+
+function loadVersions(){
+  if(window.NovaBridge&&window.NovaBridge.versions){
+    try{
+      const raw=NovaBridge.versions();
+      const arr=JSON.parse(raw||'[]');
+      if(arr.length){
+        ALL_VERS=arr.map(v=>({id:v.id,type:v.type,time:v.time,java:v.java}));
+        store.set('verCache',ALL_VERS);store.set('verCacheAt',Date.now());
+        renderVers();return;
+      }
+    }catch(e){}
+  }
+  const cache=store.get('verCache',null);
+  if(cache&&cache.length){ALL_VERS=cache;renderVers();return;}
+  ALL_VERS=FALLBACK_VERS.map(v=>({id:v.n,type:'release',time:'',java:Number((v.n.split('.')[1]||0))<=16?8:17}));
+  renderVers();
+}
 
 function renderVers(){
-  const box=$('#verList');box.innerHTML='';
-  VERS.forEach((v,i)=>{
+  const box=$('#verList');if(!box)return;box.innerHTML='';
+  const q=($('#verSearch')?$('#verSearch').value:'').trim().toLowerCase();
+  const snap=$('#showSnap')?$('#showSnap').checked:false;
+  const list=ALL_VERS.filter(v=>{
+    if(!snap&&v.type!=='release') return false;
+    if(q&&!v.id.toLowerCase().includes(q)) return false;
+    return true;
+  }).slice(0,400);
+  const relCount=ALL_VERS.filter(v=>v.type==='release').length;
+  if($('#verInfo')) $('#verInfo').textContent=`共 ${ALL_VERS.length} 个版本（正式版 ${relCount}）· 当前显示 ${list.length}`;
+  if(!list.length){box.innerHTML='<div class="hint">没有匹配的版本</div>';return;}
+  list.forEach((v,i)=>{
     const el=document.createElement('div');
-    el.className='item'+(i===curVerIdx?' sel':'');
-    el.innerHTML=`<div class="ic">⛏️</div><div class="mid"><b>${v.n} · ${v.l}</b><span>${v.s}</span></div>
-      <div class="act">${i===curVerIdx?'使用中':'选用'}</div>`;
-    el.addEventListener('click',()=>{
-      curVerIdx=i;store.set('curVerIdx',i);renderVers();syncCurVer();toast('已切换到 '+v.n);
-    });
+    const sel=v.id===curVerId;
+    el.className='item'+(sel?' sel':'');
+    el.innerHTML=`<div class="ic">⛏️</div><div class="mid"><b>${v.id}</b><span>${v.type==='release'?'正式版':'快照'} · 需要 Java ${v.java}</span></div>
+      <div class="act">${sel?'使用中':javaTag(v.java)}</div>`;
+    el.addEventListener('click',()=>pickVersion(v));
     box.appendChild(el);
   });
 }
+
+function pickVersion(v){
+  curVerId=v.id;curVerIdx=0;
+  store.set('curVerId',v.id);store.set('curVerIdx',0);loadVersions();syncCurVer();
+  if(window.NovaBridge&&window.NovaBridge.javaStatus){
+    toast('已选择 '+v.id+'（Java '+v.java+'）');
+    ensureJavaFor(v.java);
+  }else{
+    toast('已切换到 '+v.id);
+  }
+}
+
+function ensureJavaFor(major){
+  if(!(window.NovaBridge&&window.NovaBridge.ensureJava)){return;}
+  const st=JSON.parse(NovaBridge.javaStatus()||'{}');
+  if(st[major]){toast('Java '+major+' 已就绪');return;}
+  if(major===21){toast('Java 21 暂无 arm64 构建，请先选 ≤1.20.4');return;}
+  const r=NovaBridge.ensureJava(major);
+  if(r==='OK') toast('Java '+major+' 安装完成');
+  else if(r==='STARTED') toast('正在后台下载 Java '+major+'（约 39–58 MB）');
+  else toast('Java '+major+' 安装失败');
+}
 function syncCurVer(){
-  const v=VERS[curVerIdx];
-  $('#curVer').textContent=v.n+' '+v.l.split(' ')[0];
-  $('#curVerSub').textContent='就绪';
+  const v=ALL_VERS.find(x=>x.id===curVerId)||{id:curVerId,java:17};
+  $('#curVer').textContent=v.id;
+  $('#curVerSub').textContent='Java '+v.java+(window.NovaBridge?' · 就绪':' · 需 App');
 }
 renderVers();syncCurVer();
 
@@ -385,30 +472,104 @@ $('#launch').addEventListener('click',()=>{
 });
 
 /* ---------- 模组 ---------- */
-const MODS=[
-  {n:'Sodium',d:'渲染优化 · 大幅提升帧率',on:true},
-  {n:'Iris Shaders',d:'光影支持 · 兼容 OptiFine 包',on:true},
-  {n:'JEI',d:'物品配方查询',on:true},
-  {n:'Create',d:'机械动力 · 大型科技整合',on:false},
-  {n:'Farmer\'s Delight',d:'农夫乐事 · 料理扩展',on:false},
-  {n:'AppleSkin',d:'饥饿度信息增强',on:true},
-  {n:'Xaero\'s Minimap',d:'小地图 · 路径点',on:true}
-];
-function renderMods(q=''){
-  const box=$('#modList');box.innerHTML='';
-  MODS.filter(m=>m.n.toLowerCase().includes(q.toLowerCase())||m.d.includes(q)).forEach(m=>{
+/* ---------- 模组：Modrinth 在线源 + 本地已下载 ---------- */
+let LOCAL_MODS=[];
+/* 中文 → 英文关键词：Modrinth 库里是英文名，直接搜中文经常 0 结果 */
+const MOD_ALIAS={
+ '钠':'sodium','优化':'optimization','光影':'shaders','铱':'iris','铱光影':'iris',
+ '机械动力':'create','农夫乐事':"farmer's delight",'小地图':'xaero','苹果皮':'appleskin',
+ '物品管理器':'jei','配方':'jei','地图':'journeymap','按g查看配方':'rei','rei':'rei',
+ '等价交换':'projecte','暮色森林':'twilight forest','工业':'industrial craft','工业时代':'industrial craft',
+ '林业':'forestry','建筑':'buildcraft','热力':'thermal','通用机械':'mekanism',
+ '区块加载':'chunky','性能':'performance','内存':'memory','旅行地图':'journeymap',
+ '钠+':'sodium','iris':'iris','lithium':'lithium','星光':'starlight','光照':'starlight',
+ '沉浸工程':'immersive engineering','植物魔法':'botania','血魔法':'blood magic',
+ '匠魂':'tinkers construct','箱子':'storage','背包':'backpack','旅行':'travelers backpack',
+ '声音':'sound','物理':'physics','附魔':'enchantment',' loot':'loot'
+};
+function translateQuery(q){
+  if(!q) return '';
+  for(const k in MOD_ALIAS){ if(q.includes(k)) return MOD_ALIAS[k]; }
+  return q;
+}
+function fmtSize(b){return b>1048576?(b/1048576).toFixed(1)+' MB':(b/1024).toFixed(0)+' KB';}
+
+function loadLocalMods(){
+  if(window.NovaBridge&&window.NovaBridge.modList){
+    try{LOCAL_MODS=JSON.parse(NovaBridge.modList()||'[]');}catch(e){LOCAL_MODS=[];}
+  }
+  renderLocalMods(($('#modSearch')||{}).value||'');
+}
+
+function renderLocalMods(q=''){
+  const box=$('#modList');if(!box)return;box.innerHTML='';
+  const list=LOCAL_MODS.filter(m=>m.name.toLowerCase().includes(q.toLowerCase()));
+  if(!list.length){box.innerHTML='<div class="hint">还没有本地模组，用上面的“在线搜索”下载</div>';return;}
+  list.forEach(m=>{
     const el=document.createElement('div');el.className='item';
-    el.innerHTML=`<div class="ic">🧩</div><div class="mid"><b>${m.n}</b><span>${m.d}</span></div>
-      <div class="sw ${m.on?'on':''}" style="width:42px;height:24px"></div>`;
-    el.querySelector('.sw').style.cssText='width:42px;height:24px';
-    const sw=el.querySelector('.sw');
-    sw.addEventListener('click',()=>{m.on=!m.on;sw.classList.toggle('on',m.on);toast(m.n+(m.on?' 已启用':' 已停用'))});
+    el.innerHTML=`<div class="ic">🧩</div><div class="mid"><b>${m.name}</b><span>${fmtSize(m.size)} · 已下载</span></div>
+      <div class="act">删除</div>`;
+    el.querySelector('.act').addEventListener('click',()=>{
+      if(!(window.NovaBridge&&window.NovaBridge.modDelete))return toast('需在 App 内操作');
+      NovaBridge.modDelete(m.name);toast('已删除 '+m.name);loadLocalMods();
+    });
     box.appendChild(el);
   });
-  if(!box.children.length)box.innerHTML='<div class="hint">没有匹配的模组</div>';
 }
-renderMods();
-$('#modSearch').addEventListener('input',e=>renderMods(e.target.value));
+
+function onlineSearch(){
+  const rawQ=(($('#modSearch')||{}).value||'').trim();
+  const q=translateQuery(rawQ);
+  const type=($('#modType')||{}).value||'mod';
+  const loader=($('#modLoader')||{}).value||'';
+  const gv=(typeof curVerId!=='undefined'&&curVerId)?curVerId:'1.20.1';
+  const box=$('#modOnlineList');
+  if(!window.NovaBridge||!NovaBridge.apiGet){toast('在线搜索需在安装版 App 内使用');return;}
+  box.innerHTML='<div class="hint">正在向 Modrinth 搜索…</div>';
+  const facets=[['project_type:'+type],['versions:'+gv]];
+  if(loader)facets.push(['categories:'+loader]);
+  const url='https://api.modrinth.com/v2/search?limit=20&index=relevance&query='+encodeURIComponent(q)
+    +'&facets='+encodeURIComponent(JSON.stringify(facets));
+  let raw;
+  try{raw=NovaBridge.apiGet(url);}catch(e){box.innerHTML='<div class="hint">搜索失败：'+e.message+'</div>';return;}
+  if(!raw||raw.indexOf('ERROR')===0){box.innerHTML='<div class="hint">搜索失败：'+raw+'</div>';return;}
+  let d;try{d=JSON.parse(raw);}catch(e){box.innerHTML='<div class="hint">返回解析失败</div>';return;}
+  const hits=d.hits||[];
+  box.innerHTML='';
+  if(!hits.length){box.innerHTML='<div class="hint">没有匹配结果（试试换版本或去掉加载器筛选）</div>';return;}
+  hits.forEach(h=>{
+    const el=document.createElement('div');el.className='item';
+    el.innerHTML=`<div class="ic">${(h.icon_url?'':'📦')}</div><div class="mid"><b>${h.title}</b>
+      <span>${(h.description||'').slice(0,60)} · ${(h.downloads||0).toLocaleString()} 次下载</span></div>
+      <div class="act">下载</div>`;
+    el.querySelector('.act').addEventListener('click',(ev)=>{ev.stopPropagation();downloadMod(h.slug||h.project_id,gv,loader,el);});
+    box.appendChild(el);
+  });
+}
+
+function downloadMod(id,gv,loader,el){
+  const act=el.querySelector('.act');
+  act.textContent='准备…';
+  try{
+    const vUrl='https://api.modrinth.com/v2/project/'+id+'/version?game_versions='+encodeURIComponent(JSON.stringify([gv]))
+      +(loader?('&loaders='+encodeURIComponent(JSON.stringify([loader]))):'');
+    const raw=NovaBridge.apiGet(vUrl);
+    if(!raw||raw.indexOf('ERROR')===0){act.textContent='失败';toast('取文件失败：'+raw);return;}
+    const vs=JSON.parse(raw);
+    if(!vs.length){act.textContent='无适配';toast('该版本没有适配文件');return;}
+    const f=vs[0].files[0];
+    act.textContent='下载中…';
+    const res=NovaBridge.modSave(f.url,f.filename);
+    if(res&&res.indexOf('OK:')===0){
+      act.textContent='已下载';toast('已保存 '+f.filename);loadLocalMods();
+    }else{act.textContent='失败';toast('下载失败：'+res);}
+  }catch(e){act.textContent='失败';toast('出错：'+e.message);}
+}
+
+renderModsHook();
+function renderModsHook(){loadLocalMods();}
+if($('#modSearch'))$('#modSearch').addEventListener('input',e=>renderLocalMods(e.target.value));
+if($('#modOnlineBtn'))$('#modOnlineBtn').addEventListener('click',onlineSearch);
 
 /* ---------- 今日人品 ---------- */
 const LUCK=['欧皇附体，今天开箱必出传奇！','运气爆棚，抽卡十连保底金！','运势极佳，打怪掉落翻倍！','小吉，今天挖矿必出钻石！','平平淡淡，适合养老生存。','运势一般，别赌别赌。','小凶，今天小心苦力怕。','大凶，别出门别开创造。','霉运当头，今天适合下线。','绝绝子，今天点啥啥爆炸！'];
@@ -479,6 +640,17 @@ async function checkUpdate(silent){
 }
 function cmp(a,b){const x=a.split('.').map(Number),y=b.split('.').map(Number);for(let i=0;i<3;i++){if((x[i]||0)>(y[i]||0))return 1;if((x[i]||0)<(y[i]||0))return -1}return 0}
 $('#updBtn').addEventListener('click',()=>checkUpdate(false));
+if($('#verSearch'))$('#verSearch').addEventListener('input',()=>renderVers());
+if($('#showSnap'))$('#showSnap').addEventListener('change',()=>{store.set('verSnap',$('#showSnap').checked);renderVers();});
+if($('#showSnap'))$('#showSnap').checked=!!store.get('verSnap',false);
+
+/* 启动游戏：APP 内进入触屏输入层；网页版提示需安装客户端 */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('#launch');
+  if(!b) return;
+  if(window.NovaBridge&&window.NovaBridge.launchGame){ window.NovaBridge.launchGame(); }
+  else toast('启动游戏需要在安装版 App 内使用');
+});
 
 /* ---------- 离线/更新 ---------- */
 if('serviceWorker' in navigator){

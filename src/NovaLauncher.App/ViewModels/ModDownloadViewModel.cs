@@ -83,14 +83,15 @@ public partial class ModDownloadViewModel : ViewModelBase
         {
             var loader = SelectedLoader;
             var gv = GameVersion == "不限" ? null : GameVersion;
+            var query = TranslateQuery(SearchText ?? "");
             if (UseCurse)
             {
-                var items = await _curse.SearchAsync(AppServices.Config.CurseForgeApiKey, SearchText, gv, loader, CurseClassId(SelectedProjectType));
+                var items = await _curse.SearchAsync(AppServices.Config.CurseForgeApiKey, query, gv, loader, CurseClassId(SelectedProjectType));
                 foreach (var i in items) Projects.Add(i);
             }
             else
             {
-                var items = await _modrinth.SearchAsync(SearchText, gv, loader, SelectedProjectType);
+                var items = await _modrinth.SearchAsync(query, gv, loader, SelectedProjectType);
                 foreach (var i in items)
                     Projects.Add(new ModSearchItem
                     {
@@ -172,6 +173,32 @@ public partial class ModDownloadViewModel : ViewModelBase
             return;
         }
         await DownloadOneAsync(SelectedProject, version);
+    }
+
+    /// <summary>
+    /// 中文关键词 → 英文：Modrinth/CurseForge 库里都是英文名，直接搜中文常常 0 结果。
+    /// 命中即替换，未命中保持原文。
+    /// </summary>
+    private static readonly Dictionary<string, string> ModAlias = new()
+    {
+        ["钠"] = "sodium", ["铱"] = "iris", ["光影"] = "shaders", ["优化"] = "optimization",
+        ["机械动力"] = "create", ["农夫乐事"] = "farmer's delight", ["小地图"] = "xaero",
+        ["苹果皮"] = "appleskin", ["物品管理器"] = "jei", ["配方"] = "jei", ["rei"] = "rei",
+        ["等价交换"] = "projecte", ["暮色森林"] = "twilight forest", ["工业"] = "industrial craft",
+        ["工业时代"] = "industrial craft", ["林业"] = "forestry", ["建筑"] = "buildcraft",
+        ["热力"] = "thermal", ["通用机械"] = "mekanism", ["区块加载"] = "chunky",
+        ["旅行地图"] = "journeymap", ["星光"] = "starlight", ["沉浸工程"] = "immersive engineering",
+        ["植物魔法"] = "botania", ["血魔法"] = "blood magic", ["匠魂"] = "tinkers construct",
+        ["背包"] = "backpack", ["物理"] = "physics", ["附魔"] = "enchantment",
+        ["锂"] = "lithium", ["内存"] = "memory"
+    };
+
+    private static string TranslateQuery(string q)
+    {
+        if (string.IsNullOrWhiteSpace(q)) return q;
+        foreach (var kv in ModAlias)
+            if (q.Contains(kv.Key)) return kv.Value;
+        return q;
     }
 
     /// <summary>下载并导入 Modrinth 整合包（.mrpack）到目标版本。</summary>
