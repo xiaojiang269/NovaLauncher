@@ -298,7 +298,7 @@ nav a.on em{transform:translateY(-1px)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='3.4.8';
+const APP_VER='3.4.9';
 const API='https://api.github.com/repos/xiaojiang269/NovaLauncher/releases/latest';
 const IS_APP=/NovaLauncherApp/.test(navigator.userAgent);
 document.addEventListener('DOMContentLoaded',()=>{const a=document.getElementById('aboutVer');if(a)a.textContent=APP_VER;});
@@ -681,6 +681,40 @@ if(screen.orientation && screen.orientation.lock){
 }
 const initHash=location.hash.replace('#','');
 if(initHash&&document.getElementById('p-'+initHash))goPage(initHash);
+
+/* ---------- Java 版启动闭环（实验）：注入一张启动卡 ---------- */
+(function(){
+  if(!window.NovaBridge||!NovaBridge.javaLaunch)return;
+  var host=document.getElementById('p-home')||document.body;
+  var card=document.createElement('div');
+  card.style.cssText='margin:14px;padding:12px;border:2px solid #000;background:#2b2119;color:#e8ded0;font-size:13px;border-radius:6px';
+  card.innerHTML='<div style="font-weight:700;margin-bottom:8px">Java 版启动（实验）</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+    +'<input id="jvVer" value="1.20.1" style="width:110px;padding:6px;background:#1b1510;color:#fff;border:2px solid #000;border-radius:4px">'
+    +'<input id="jvUser" value="Steve" style="width:120px;padding:6px;background:#1b1510;color:#fff;border:2px solid #000;border-radius:4px">'
+    +'<button id="jvGo" style="padding:7px 12px;background:#5f9c33;color:#fff;border:2px solid #000;border-radius:4px;font-weight:700">安装并启动</button>'
+    +'<button id="jvStop" style="padding:7px 12px;background:#7a4a3a;color:#fff;border:2px solid #000;border-radius:4px">停止</button>'
+    +'</div><pre id="jvLog" style="margin:8px 0 0;max-height:160px;overflow:auto;background:#140f0b;border:2px solid #000;padding:8px;font-size:11.5px;line-height:1.55;white-space:pre-wrap;color:#b9ac9a"></pre>';
+  host.appendChild(card);
+
+  var logEl=card.querySelector('#jvLog'), timer=null, last='';
+  function poll(){
+    var t=NovaBridge.javaLog()||'';
+    if(t!==last){last=t;logEl.textContent=t;logEl.scrollTop=logEl.scrollHeight;}
+  }
+  card.querySelector('#jvGo').addEventListener('click',function(){
+    var v=card.querySelector('#jvVer').value.trim()||'1.20.1';
+    var u=card.querySelector('#jvUser').value.trim()||'Steve';
+    var r=NovaBridge.javaLaunch(v,u);
+    if(r==='RUNNING'){toast('已有进程在运行');return;}
+    toast('已开始安装并启动 '+v);
+    if(timer)clearInterval(timer);
+    timer=setInterval(poll,700);
+  });
+  card.querySelector('#jvStop').addEventListener('click',function(){
+    NovaBridge.javaStop();toast('已请求停止');
+  });
+})();
 </script>
 </body>
 </html>
