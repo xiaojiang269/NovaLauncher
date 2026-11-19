@@ -280,7 +280,7 @@ nav a.on em{transform:translateY(-1px)}
       </div>
       <div class="card">
         <h3><i>ℹ️</i>关于</h3>
-        <div class="row"><div class="k">版本</div><div class="v" id="aboutVer">3.3.0</div></div>
+        <div class="row"><div class="k">版本</div><div class="v" id="aboutVer">3.4.7</div></div>
         <div class="row"><div class="k">形态</div><div class="v">PWA 手机版</div></div>
         <div class="row"><div class="k">支持</div><div class="v">Android · iOS · HarmonyOS</div></div>
       </div>
@@ -298,9 +298,10 @@ nav a.on em{transform:translateY(-1px)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='3.4.0';
+const APP_VER='3.4.8';
 const API='https://api.github.com/repos/xiaojiang269/NovaLauncher/releases/latest';
 const IS_APP=/NovaLauncherApp/.test(navigator.userAgent);
+document.addEventListener('DOMContentLoaded',()=>{const a=document.getElementById('aboutVer');if(a)a.textContent=APP_VER;});
 async function ghJson(url){
   if(window.NovaBridge&&window.NovaBridge.httpGet){
     const txt=window.NovaBridge.httpGet(url);
@@ -615,17 +616,23 @@ async function checkUpdate(silent){
   try{
     const d=await ghJson(API);
     latest=d.tag_name;
-    const lv=latest.replace(/^v/,'');
-    if(cmp(lv,APP_VER)>0){
-      btn.textContent='发现 '+latest;btn.classList.add('new');
+    // 手机版版本号与桌面 tag 不同体系，改为看 APK 资产里的版本号
+    const apk=(d.assets||[]).find(a=>/\.apk$/i.test(a.name));
+    const av=apk?(apk.name.match(/(\d+\.\d+\.\d+)/)||[null,APP_VER])[1]:APP_VER;
+    const isNew=apk&&cmp(av,APP_VER)>0;
+    if(isNew){
+      btn.textContent='发现新版 '+av;btn.classList.add('new');
       if(!silent){
-        openDlg('发现新版本 '+latest,
+        openDlg('发现新版本 '+av,
           `<p>${(d.body||'NovaLauncher 新版本').slice(0,160)}</p>
            <p class="hint">网页版更新会自动生效（下次打开即为新版）；如需桌面版请前往发布页。</p>`,
-          ['立即更新','稍后']);
+          ['立即下载安装','稍后']);
         $('#dlg').querySelectorAll('.btn')[0].addEventListener('click',()=>{
-          if(IS_APP){window.open(REL_PAGE,'_blank');$('#mask').classList.remove('on');}
-          else location.reload();
+          $('#mask').classList.remove('on');
+          if(IS_APP){
+            if(apk&&window.NovaBridge&&NovaBridge.openUrl)NovaBridge.openUrl(apk.browser_download_url);
+            else window.open(apk?apk.browser_download_url:REL_PAGE,'_blank');
+          } else location.reload();
         });
         $('#dlg').querySelectorAll('.btn')[1].addEventListener('click',()=>$('#mask').classList.remove('on'));
       }
