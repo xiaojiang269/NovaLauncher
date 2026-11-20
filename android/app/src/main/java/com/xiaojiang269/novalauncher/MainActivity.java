@@ -71,8 +71,8 @@ public class MainActivity extends Activity {
         String mode = getSharedPreferences("nova_prefs", MODE_PRIVATE).getString("orient", "auto");
         int o;
         if ("portrait".equals(mode)) o = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
-        else if ("auto".equals(mode)) o = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
-        else o = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+        else if ("sensor".equals(mode)) o = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
+        else o = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;   // auto = 自动横屏（左右随重力翻转）
         setRequestedOrientation(o);
     }
 
