@@ -160,7 +160,16 @@ nav a.on em{transform:translateY(-1px)}
 .toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);background:rgba(20,32,46,.92);color:#fff;font-size:12px;padding:9px 15px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;z-index:60;max-width:86%;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%)}
 
-/* 性能模式：关掉毛玻璃/模糊/动效，背景换纯色，低端机也能稳 */
+/* 中档：撤掉大背景图与模糊，保留圆角与短过渡 */
+body.mid{background:linear-gradient(180deg,#16283c,#0d1b2a)!important}
+body.mid #veil{background:rgba(13,27,42,.62)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+body.mid header,body.mid nav{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(20,32,46,.9)!important}
+body.mid .card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(27,21,16,.86)!important;box-shadow:0 2px 6px rgba(0,0,0,.35)!important}
+body.mid .tt,body.mid .k,body.mid h3,body.mid nav a{color:#e8ded0!important}
+body.mid *{transition-duration:.08s!important;animation-duration:.12s!important}
+
+/* 低档：全部动效与阴影归零 */
+
 body.lite,body.lite #veil,body.lite header,body.lite nav,body.lite .card,body.lite .logo,body.lite .toast{
   backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important}
 body.lite{background:#0d1b2a!important}
@@ -177,7 +186,7 @@ body.lite *,body.lite *::before,body.lite *::after{transition:none!important;ani
 <div id="app">
   <header>
     <div class="logo"><img src="assets/icon-192.png" alt="NovaLauncher"></div>
-    <div class="tt"><b>NovaLauncher</b><span>手机版 · <span id="ver">3.5.1</span></span></div>
+    <div class="tt"><b>NovaLauncher</b><span>手机版 · <span id="ver">3.6.0</span></span></div>
     <button class="upd" id="updBtn">检查更新</button>
   </header>
   <main>
@@ -258,7 +267,7 @@ body.lite *,body.lite *::before,body.lite *::after{transition:none!important;ani
         <div class="row"><div class="k">背景透明度</div><input type="range" id="opBg" min="0" max="100" value="72"></div>
         <div class="row"><div class="k">液态玻璃（毛玻璃）</div><div class="sw" id="swGlass"></div></div>
         <div class="row"><div class="k">深色导航栏</div><div class="sw" id="swDark"></div></div>
-        <div class="row"><div class="k">性能模式（低配/省电）</div><div class="sw" id="swLite"></div></div>
+        <div class="row" id="rowQuality"><div class="k">渲染质量</div><div class="v" id="qVal" style="cursor:pointer">自动</div></div>
       </div>
       <div class="card">
         <h3><i>⚙️</i>启动</h3>
@@ -310,7 +319,7 @@ body.lite *,body.lite *::before,body.lite *::after{transition:none!important;ani
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='3.5.1';
+const APP_VER='3.6.0';
 const API='https://api.github.com/repos/xiaojiang269/NovaLauncher/releases/latest';
 const IS_APP=/NovaLauncherApp/.test(navigator.userAgent);
 document.addEventListener('DOMContentLoaded',()=>{const a=document.getElementById('aboutVer');if(a)a.textContent=APP_VER;});
@@ -363,9 +372,61 @@ function applyTheme(){
 }
 $('#opBg').addEventListener('input',e=>{store.set('bgOpacity',+e.target.value);applyTheme()});
 $('#swGlass').addEventListener('click',()=>{store.set('glass',!store.get('glass',false));applyTheme();toast(store.get('glass',false)?'液态玻璃已开启':'液态玻璃已关闭')});
-function applyLite(on){document.body.classList.toggle('lite',!!on);var el=$('#swLite');if(el)el.classList.toggle('on',!!on);}
-applyLite(store.get('lite',false));
-$('#swLite').addEventListener('click',function(){var v=!store.get('lite',false);store.set('lite',v);applyLite(v);toast(v?'性能模式已开启（关闭毛玻璃与动效）':'性能模式已关闭');});
+/* ---------- 自适应渲染质量：自动测帧率，按机型与实时表现升降档 ---------- */
+const QLEVELS=['auto','high','mid','lite'];
+const QNAME={auto:'自动',high:'高',mid:'中',lite:'低'};
+let qMode=store.get('quality','auto');   // 用户设定
+let qApplied='high';                      // 实际生效档
+function applyQuality(level,reason){
+  if(level===qApplied&&document.body.classList.contains('q-'+level))return;
+  document.body.classList.remove('q-high','q-mid','q-lite','lite','mid');
+  document.body.classList.add('q-'+level);
+  if(level==='lite')document.body.classList.add('lite');
+  if(level==='mid')document.body.classList.add('mid');
+  qApplied=level;
+  if(reason)toast('渲染质量 → '+QNAME[level]+'（'+reason+'）');
+}
+function decideInitial(){
+  const cores=navigator.hardwareConcurrency||4;
+  const mem=navigator.deviceMemory||4;
+  if(qMode!=='auto')return qMode;
+  if(cores<=4||mem<=2)return 'mid';
+  if(cores<=2)return 'lite';
+  return 'high';
+}
+function renderQualityLabel(){
+  const el=document.getElementById('qVal');
+  if(!el)return;
+  el.textContent = qMode==='auto' ? ('自动 · 当前'+QNAME[qApplied]) : QNAME[qMode];
+}
+// 帧率采样：每秒统计 rAF 帧数，连续掉帧则降档，持续流畅再升回
+let qFrames=0,qLow=0,qHigh=0,qLast=performance.now();
+function qTick(now){
+  qFrames++;
+  const dt=now-qLast;
+  if(dt>=1000){
+    const fps=qFrames*1000/dt; qFrames=0; qLast=now;
+    if(qMode==='auto'){
+      if(fps<38){ qLow++; qHigh=0; }
+      else if(fps>52){ qHigh++; qLow=0; }
+      else { qLow=0; qHigh=0; }
+      if(qLow>=2 && qApplied!=='lite'){ applyQuality(qApplied==='high'?'mid':'lite','帧率 '+Math.round(fps)+'fps'); qLow=0; }
+      else if(qHigh>=10 && qApplied!=='high'){ applyQuality(qApplied==='lite'?'mid':'high','帧率恢复 '+Math.round(fps)+'fps'); qHigh=0; }
+    }
+    renderQualityLabel();
+  }
+  requestAnimationFrame(qTick);
+}
+applyQuality(decideInitial());
+renderQualityLabel();
+requestAnimationFrame(qTick);
+document.getElementById('rowQuality').addEventListener('click',function(){
+  qMode=QLEVELS[(QLEVELS.indexOf(qMode)+1)%QLEVELS.length];
+  store.set('quality',qMode);
+  if(qMode==='auto'){ qLow=0;qHigh=0; applyQuality(decideInitial(),'重新自适应'); }
+  else applyQuality(qMode,'手动设定');
+  renderQualityLabel();
+});
 $('#swDark').addEventListener('click',()=>{store.set('darkNav',!store.get('darkNav',false));applyTheme()});
 ['swIso','swAnim','swUpd'].forEach(id=>$('#'+id).addEventListener('click',e=>e.currentTarget.classList.toggle('on')));
 
