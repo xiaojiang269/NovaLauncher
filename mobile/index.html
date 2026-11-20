@@ -25,7 +25,7 @@ body{
 
 /* 顶栏 */
 header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.55)}
-.logo{width:34px;height:34px;border-radius:10px;background:#1b5faa;display:grid;place-items:center;font-size:18px;box-shadow:0 4px 12px rgba(27,95,170,.35)}
+.logo{width:34px;height:34px;border-radius:0;background:transparent;display:grid;place-items:center;font-size:18px;overflow:hidden}.logo img{width:100%;height:100%;object-fit:cover;display:block}
 .tt{flex:1;min-width:0}
 .tt b{display:block;font-size:15px;letter-spacing:.2px}
 .tt span{font-size:10px;color:#4a5560}
@@ -165,8 +165,8 @@ nav a.on em{transform:translateY(-1px)}
 <div id="veil"></div>
 <div id="app">
   <header>
-    <div class="logo">🎮</div>
-    <div class="tt"><b>NovaLauncher</b><span>手机版 · <span id="ver">3.3.0</span></span></div>
+    <div class="logo"><img src="assets/icon-192.png" alt="NovaLauncher"></div>
+    <div class="tt"><b>NovaLauncher</b><span>手机版 · <span id="ver">3.5.0</span></span></div>
     <button class="upd" id="updBtn">检查更新</button>
   </header>
   <main>
@@ -298,7 +298,7 @@ nav a.on em{transform:translateY(-1px)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='3.4.9';
+const APP_VER='3.5.0';
 const API='https://api.github.com/repos/xiaojiang269/NovaLauncher/releases/latest';
 const IS_APP=/NovaLauncherApp/.test(navigator.userAgent);
 document.addEventListener('DOMContentLoaded',()=>{const a=document.getElementById('aboutVer');if(a)a.textContent=APP_VER;});

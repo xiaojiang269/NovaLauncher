@@ -27,6 +27,8 @@ public partial class App : Application
                 await Task.Delay(2300); // 启动动画展示时长
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
+                  try
+                  {
                     AppServices.Init(); // 初始化全局服务
 
                     var mainWindow = new MainWindow
@@ -37,6 +39,12 @@ public partial class App : Application
                     desktop.MainWindow = mainWindow;
                     mainWindow.Show();
                     splash.Close();
+                  }
+                  catch (Exception ex)
+                  {
+                      try { File.WriteAllText("/tmp/nova-init-error.log", ex.ToString()); } catch {}
+                      Console.Error.WriteLine(ex);
+                  }
                 });
             });
         }

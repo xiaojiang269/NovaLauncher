@@ -11,13 +11,13 @@
         <Border Background="#13131C" CornerRadius="20" BorderBrush="#2E3058" BorderThickness="1" Margin="6">
             <StackPanel Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center" Width="360">
                 <!-- Logo 动画：渐显 + 轻微放大 -->
-                <Border Width="96" Height="96" CornerRadius="26" Background="#7C4DFF" HorizontalAlignment="Center">
+                <Border Width="96" Height="96" CornerRadius="26" Background="Transparent" ClipToBounds="True" HorizontalAlignment="Center">
                     <Border.Transitions>
                         <Transitions>
                             <DoubleTransition Property="Opacity" Duration="0:0:0.8"/>
                         </Transitions>
                     </Border.Transitions>
-                    <TextBlock Text="🎮" FontSize="52" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="/Assets/nova-512.png" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality"/>
                 </Border>
 
                 <StackPanel Spacing="6" HorizontalAlignment="Center">
@@ -29,7 +29,7 @@
 
                 <!-- 加载进度条动画 -->
                 <ProgressBar IsIndeterminate="True" Width="300" Height="6"
-                             HorizontalAlignment="Center" Foreground="#7C4DFF"/>
+                             HorizontalAlignment="Center" Foreground="#8CC64A"/>
 
                 <TextBlock Text="正在初始化运行环境…" FontSize="11"
                            Foreground="#9AA0B8" HorizontalAlignment="Center"/>

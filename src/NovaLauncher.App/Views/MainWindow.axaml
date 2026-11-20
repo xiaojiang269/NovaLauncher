@@ -1,4 +1,4 @@
-<Window Icon="avares://NovaLauncher.App/Assets/nova.ico" xmlns="https://github.com/avaloniaui"
+<Window Icon="/Assets/nova-512.png" xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:NovaLauncher.App.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -58,8 +58,8 @@
                 <!-- Logo 区域 -->
                 <Border DockPanel.Dock="Top" Padding="20,20,20,16" Background="#F2FFFFFF">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Border Width="38" Height="38" CornerRadius="8" Background="#1976D2" VerticalAlignment="Center">
-                            <TextBlock Text="🎮" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Border Width="38" Height="38" CornerRadius="6" Background="Transparent" ClipToBounds="True" VerticalAlignment="Center">
+                            <Image Source="/Assets/nova-512.png" Stretch="UniformToFill" RenderOptions.BitmapInterpolationMode="HighQuality"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="NovaLauncher" FontSize="17" FontWeight="Bold" Foreground="#212121"/>
