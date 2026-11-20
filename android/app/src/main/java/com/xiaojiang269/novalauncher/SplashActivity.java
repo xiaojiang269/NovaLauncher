@@ -31,6 +31,15 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // 首帧就横屏：在 setContentView 之前锁定方向，避免先竖后转的闪动
+        String mode = getSharedPreferences("nova_prefs", MODE_PRIVATE).getString("orient", "auto");
+        if ("portrait".equals(mode)) {
+            setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+        } else if ("sensor".equals(mode)) {
+            setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        } else {
+            setRequestedOrientation(android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        }
         setContentView(buildUi());
         checkRuntime();
     }

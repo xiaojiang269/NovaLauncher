@@ -20,7 +20,7 @@ jobs:
 
       - name: Download APK
         run: |
-          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-3.8.9-ci.apk
+          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-3.9.0-ci.apk
           ls -l app.apk
 
       - name: Run emulator and collect logs
@@ -35,7 +35,10 @@ jobs:
             adb shell pm list packages | grep novalauncher
             adb logcat -c
             adb shell am start -n com.xiaojiang269.novalauncher/.SplashActivity
-            sleep 40
+            sleep 3
+            adb shell screencap -p /sdcard/shot0.png
+            adb pull /sdcard/shot0.png shot0.png
+            sleep 37
             adb shell screencap -p /sdcard/shot1.png
             adb pull /sdcard/shot1.png shot1.png
             sleep 60
@@ -55,6 +58,7 @@ jobs:
         with:
           name: android-smoke
           path: |
+            shot0.png
             shot1.png
             shot2.png
             shot3.png
