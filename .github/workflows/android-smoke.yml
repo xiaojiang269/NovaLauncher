@@ -20,7 +20,7 @@ jobs:
 
       - name: Download APK
         run: |
-          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-4.0.7-ci.apk
+          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-4.0.8-ci.apk
           ls -l app.apk
 
       - name: Run emulator and collect logs
@@ -50,6 +50,8 @@ jobs:
             adb pull /sdcard/shot3.png shot3.png
             adb logcat -d > logcat.txt
             adb shell dumpsys activity activities | head -40 > activity.txt
+            adb shell run-as com.xiaojiang269.novalauncher cat files/mc-out.log > mc-out.log 2>&1 || true
+            tail -60 mc-out.log || true
             grep -E "NovaRT|jrelog|LIBGL|NovaGL|novalauncher|AndroidRuntime|FATAL|OpenJDK" logcat.txt | tail -120 > filtered.txt || true
 
       - name: Upload artifacts
@@ -65,3 +67,4 @@ jobs:
             logcat.txt
             filtered.txt
             activity.txt
+            mc-out.log
