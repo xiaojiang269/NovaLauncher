@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.xiaojiang269.novalauncher"
-    android:versionCode="49"
-    android:versionName="3.8.0">
+    android:versionCode="56"
+    android:versionName="3.8.7">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -19,7 +19,7 @@
         <activity
             android:name=".SplashActivity"
             android:exported="true"
-            android:screenOrientation="sensorPortrait"
+            android:screenOrientation="fullSensor"
             android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:screenOrientation="sensorPortrait"
+            android:screenOrientation="fullSensor"
             android:configChanges="orientation|screenSize|keyboardHidden" />
 
         <activity

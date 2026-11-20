@@ -61,8 +61,19 @@ public class MainActivity extends Activity {
         web.setWebChromeClient(new WebChromeClient());
         web.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
+        applyOrientation();
         setContentView(web);
         web.loadUrl("file:///android_asset/index.html");
+    }
+
+    /** 屏幕方向偏好：landscape / portrait / auto，默认横屏（键位布局按 PC 设计）。 */
+    private void applyOrientation() {
+        String mode = getSharedPreferences("nova_prefs", MODE_PRIVATE).getString("orient", "landscape");
+        int o;
+        if ("portrait".equals(mode)) o = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+        else if ("auto".equals(mode)) o = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
+        else o = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+        setRequestedOrientation(o);
     }
 
     public class NetBridge {
@@ -77,6 +88,21 @@ public class MainActivity extends Activity {
                     }
                 }
             });
+        }
+
+        /** 切换屏幕方向：landscape / portrait / auto。 */
+        @JavascriptInterface
+        public void setOrientation(final String mode) {
+            getSharedPreferences("nova_prefs", MODE_PRIVATE).edit().putString("orient", mode).apply();
+            runOnUiThread(new Runnable() {
+                public void run() { applyOrientation(); }
+            });
+        }
+
+        /** 当前屏幕方向偏好。 */
+        @JavascriptInterface
+        public String orientation() {
+            return getSharedPreferences("nova_prefs", MODE_PRIVATE).getString("orient", "landscape");
         }
 
         /** 全量 MC 版本目录（含每个版本的 Java 需求），供页面渲染版本列表。 */
