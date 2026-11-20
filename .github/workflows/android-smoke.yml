@@ -20,7 +20,7 @@ jobs:
 
       - name: Download APK
         run: |
-          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-3.8.2-ci.apk
+          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-3.8.3-ci.apk
           ls -l app.apk
 
       - name: Run emulator and collect logs
@@ -41,8 +41,8 @@ jobs:
             sleep 60
             adb shell screencap -p /sdcard/shot2.png
             adb pull /sdcard/shot2.png shot2.png
-            adb shell input tap 540 1900
-            sleep 150
+            adb shell input tap 540 1710
+            sleep 240
             adb shell screencap -p /sdcard/shot3.png
             adb pull /sdcard/shot3.png shot3.png
             adb logcat -d > logcat.txt
