@@ -159,6 +159,17 @@ nav a.on em{transform:translateY(-1px)}
 #dont{background:#ffe6e8;color:#c62828;border:1px solid #ffc5cb;font-size:15px;padding:15px}
 .toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);background:rgba(20,32,46,.92);color:#fff;font-size:12px;padding:9px 15px;border-radius:999px;opacity:0;transition:.25s;pointer-events:none;z-index:60;max-width:86%;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%)}
+
+/* 性能模式：关掉毛玻璃/模糊/动效，背景换纯色，低端机也能稳 */
+body.lite,body.lite #veil,body.lite header,body.lite nav,body.lite .card,body.lite .logo,body.lite .toast{
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important}
+body.lite{background:#0d1b2a!important}
+body.lite #veil{background:rgba(13,27,42,.55)!important}
+body.lite header{background:rgba(20,32,46,.92)!important;border-bottom-color:rgba(255,255,255,.12)!important}
+body.lite nav{background:rgba(20,32,46,.92)!important;border-top-color:rgba(255,255,255,.12)!important}
+body.lite nav a,body.lite .tt,body.lite .k,body.lite h3{color:#e8ded0!important}
+body.lite .card{background:rgba(27,21,16,.88)!important;border:1px solid rgba(255,255,255,.08)!important}
+body.lite *,body.lite *::before,body.lite *::after{transition:none!important;animation:none!important}
 </style>
 </head>
 <body>
@@ -166,7 +177,7 @@ nav a.on em{transform:translateY(-1px)}
 <div id="app">
   <header>
     <div class="logo"><img src="assets/icon-192.png" alt="NovaLauncher"></div>
-    <div class="tt"><b>NovaLauncher</b><span>手机版 · <span id="ver">3.5.0</span></span></div>
+    <div class="tt"><b>NovaLauncher</b><span>手机版 · <span id="ver">3.5.1</span></span></div>
     <button class="upd" id="updBtn">检查更新</button>
   </header>
   <main>
@@ -247,6 +258,7 @@ nav a.on em{transform:translateY(-1px)}
         <div class="row"><div class="k">背景透明度</div><input type="range" id="opBg" min="0" max="100" value="72"></div>
         <div class="row"><div class="k">液态玻璃（毛玻璃）</div><div class="sw" id="swGlass"></div></div>
         <div class="row"><div class="k">深色导航栏</div><div class="sw" id="swDark"></div></div>
+        <div class="row"><div class="k">性能模式（低配/省电）</div><div class="sw" id="swLite"></div></div>
       </div>
       <div class="card">
         <h3><i>⚙️</i>启动</h3>
@@ -298,7 +310,7 @@ nav a.on em{transform:translateY(-1px)}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='3.5.0';
+const APP_VER='3.5.1';
 const API='https://api.github.com/repos/xiaojiang269/NovaLauncher/releases/latest';
 const IS_APP=/NovaLauncherApp/.test(navigator.userAgent);
 document.addEventListener('DOMContentLoaded',()=>{const a=document.getElementById('aboutVer');if(a)a.textContent=APP_VER;});
@@ -351,6 +363,9 @@ function applyTheme(){
 }
 $('#opBg').addEventListener('input',e=>{store.set('bgOpacity',+e.target.value);applyTheme()});
 $('#swGlass').addEventListener('click',()=>{store.set('glass',!store.get('glass',false));applyTheme();toast(store.get('glass',false)?'液态玻璃已开启':'液态玻璃已关闭')});
+function applyLite(on){document.body.classList.toggle('lite',!!on);var el=$('#swLite');if(el)el.classList.toggle('on',!!on);}
+applyLite(store.get('lite',false));
+$('#swLite').addEventListener('click',function(){var v=!store.get('lite',false);store.set('lite',v);applyLite(v);toast(v?'性能模式已开启（关闭毛玻璃与动效）':'性能模式已关闭');});
 $('#swDark').addEventListener('click',()=>{store.set('darkNav',!store.get('darkNav',false));applyTheme()});
 ['swIso','swAnim','swUpd'].forEach(id=>$('#'+id).addEventListener('click',e=>e.currentTarget.classList.toggle('on')));
 
