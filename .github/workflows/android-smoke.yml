@@ -20,7 +20,7 @@ jobs:
 
       - name: Download APK
         run: |
-          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-3.8.1-ci.apk
+          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-3.8.2-ci.apk
           ls -l app.apk
 
       - name: Run emulator and collect logs
@@ -38,9 +38,13 @@ jobs:
             sleep 40
             adb shell screencap -p /sdcard/shot1.png
             adb pull /sdcard/shot1.png shot1.png
-            sleep 80
+            sleep 60
             adb shell screencap -p /sdcard/shot2.png
             adb pull /sdcard/shot2.png shot2.png
+            adb shell input tap 540 1900
+            sleep 150
+            adb shell screencap -p /sdcard/shot3.png
+            adb pull /sdcard/shot3.png shot3.png
             adb logcat -d > logcat.txt
             adb shell dumpsys activity activities | head -40 > activity.txt
             grep -E "NovaGL|novalauncher|AndroidRuntime|FATAL" logcat.txt | tail -120 > filtered.txt || true
@@ -53,6 +57,7 @@ jobs:
           path: |
             shot1.png
             shot2.png
+            shot3.png
             logcat.txt
             filtered.txt
             activity.txt
