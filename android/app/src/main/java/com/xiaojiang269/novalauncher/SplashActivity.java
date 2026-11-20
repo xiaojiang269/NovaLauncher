@@ -88,8 +88,7 @@ public class SplashActivity extends Activity {
             @Override
             public void run() {
                 if (!RuntimeBoot.isArm64()) {
-                    show("当前设备不是 arm64，暂不支持", "SUPPORTED_ABIS=" + android.os.Build.SUPPORTED_ABIS[0], false);
-                    return;
+                    showStatus("非 arm64 设备：准备对应架构运行时 …");
                 }
                 showStatus("首次启动：正在安装 Java 17 …");
                 RuntimeBoot.Log log = new RuntimeBoot.Log() {
@@ -101,7 +100,7 @@ public class SplashActivity extends Activity {
                         });
                     }
                 };
-                File java = RuntimeBoot.ensure(SplashActivity.this, log);
+                File java = RuntimeBoot.ensureAny(SplashActivity.this, log);
                 if (java == null) {
                     show("Java 安装失败", "可尝试重新安装 APK，或把上面的日志发给我们", false);
                     return;

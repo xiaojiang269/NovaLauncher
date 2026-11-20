@@ -128,6 +128,20 @@ public final class RuntimeBoot {
         return new File(c.getFilesDir(), "jre");
     }
 
+    /** 按设备 ABI 准备运行时：arm64 走内置包，其它架构联网取对应构建。 */
+    public static File ensureAny(Context c, Log log) {
+        File root = dirFor(c, 17);
+        File java = new File(root, "bin/java");
+        if (java.exists() && java.length() > 0) { log.line("运行时已存在"); return java; }
+        if (!isArm64()) {
+            log.line("非 arm64 设备（" + android.os.Build.SUPPORTED_ABIS[0] + "），改用对应架构运行时");
+            File j = downloadAndExtract(c, URL_JRE17_X86_64, root, log);
+            if (j != null) probeVersion(j, log);
+            return j;
+        }
+        return ensure(c, log);
+    }
+
     /** 解压（已存在则跳过），返回可执行的 java 文件；失败返回 null。 */
     public static File ensure(Context c, Log log) {
         File root = dirFor(c, 17);
@@ -179,20 +193,38 @@ public final class RuntimeBoot {
         }
     }
 
+
+    /**
+     * Android 10+ 禁止从应用数据目录直接 execve（SELinux: execute_no_trans denied），
+     * 改由系统 linker 作为入口 mmap 目标二进制，绕开该限制。
+     */
+    public static java.util.List<String> cmd(File java) {
+        java.util.List<String> c = new java.util.ArrayList<String>();
+        File linker = new File("/system/bin/linker64");
+        boolean useLinker = android.os.Build.VERSION.SDK_INT >= 29 && linker.exists() && linker.canExecute();
+        if (useLinker) c.add(linker.getAbsolutePath());
+        c.add(java.getAbsolutePath());
+        return c;
+    }
+
     /** 跑一次 java -version，证明运行时真的能启动（输出前 2 行）。 */
     public static boolean probeVersion(File java, Log log) {
         if (java == null) return false;
         Process p = null;
         try {
-            ProcessBuilder pb = new ProcessBuilder(java.getAbsolutePath(), "-version");
+            java.util.List<String> vc = cmd(java); vc.add("-version");
+            ProcessBuilder pb = new ProcessBuilder(vc);
             pb.redirectErrorStream(true);
-            pb.environment().put("LD_LIBRARY_PATH", java.getParentFile().getAbsolutePath());
+            File rootDir = java.getParentFile().getParentFile();
+            pb.environment().put("LD_LIBRARY_PATH", new File(rootDir, "lib").getAbsolutePath()
+                    + ":" + java.getParentFile().getAbsolutePath());
             p = pb.start();
             BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String s; int n = 0;
-            while ((s = r.readLine()) != null && n < 2) { log.line("  " + s); n++; }
+            while ((s = r.readLine()) != null && n < 2) { log.line("  " + s); android.util.Log.i("NovaRT", "java: " + s); n++; }
             int code = p.waitFor();
             log.line(code == 0 ? "Java 运行时自检通过" : "Java 运行时自检失败（退出码 " + code + "）");
+            android.util.Log.i("NovaRT", "probeVersion exit=" + code);
             return code == 0;
         } catch (Throwable t) {
             log.line("Java 运行时无法执行：" + t);
@@ -212,7 +244,8 @@ public final class RuntimeBoot {
             String libPath = c.getApplicationInfo().nativeLibraryDir + ":" + new File(root, "lib").getAbsolutePath();
             String cp = new File(work, "probe.jar").getAbsolutePath() + ":"
                     + new File(work, "lwjgl3.jar").getAbsolutePath();
-            ProcessBuilder pb = new ProcessBuilder(java.getAbsolutePath(), "-cp", cp, "nova.probe.NativeProbe");
+            java.util.List<String> pc = cmd(java); pc.add("-cp"); pc.add(cp); pc.add("nova.probe.NativeProbe");
+            ProcessBuilder pb = new ProcessBuilder(pc);
             pb.directory(work);
             pb.redirectErrorStream(true);
             pb.environment().put("LD_LIBRARY_PATH", libPath);
@@ -242,7 +275,7 @@ public final class RuntimeBoot {
         Process p = null;
         try {
             File root = java.getParentFile().getParentFile();
-            ProcessBuilder pb = new ProcessBuilder(java.getAbsolutePath(), "-version");
+            ProcessBuilder pb = new ProcessBuilder(cmd(java));
             pb.directory(root);
             pb.redirectErrorStream(true);
             pb.environment().put("LD_LIBRARY_PATH", new File(root, "lib").getAbsolutePath());

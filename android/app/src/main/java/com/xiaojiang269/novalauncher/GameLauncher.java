@@ -55,8 +55,7 @@ public final class GameLauncher {
             String libPath = c.getApplicationInfo().nativeLibraryDir + ":"
                     + new File(root, "lib").getAbsolutePath() + ":" + ins.nativesDir.getAbsolutePath();
 
-            List<String> cmd = new ArrayList<String>();
-            cmd.add(java.getAbsolutePath());
+            List<String> cmd = RuntimeBoot.cmd(java);
             cmd.add("-Xmx2G");
             cmd.add("-XX:+UseG1GC");
             cmd.add("-Djava.library.path=" + ins.nativesDir.getAbsolutePath());
