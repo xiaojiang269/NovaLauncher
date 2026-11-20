@@ -20,7 +20,7 @@ jobs:
 
       - name: Download APK
         run: |
-          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-3.8.0-ci.apk
+          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-3.8.1-ci.apk
           ls -l app.apk
 
       - name: Run emulator and collect logs
@@ -35,9 +35,12 @@ jobs:
             adb shell pm list packages | grep novalauncher
             adb logcat -c
             adb shell am start -n com.xiaojiang269.novalauncher/.SplashActivity
-            sleep 45
+            sleep 40
             adb shell screencap -p /sdcard/shot1.png
             adb pull /sdcard/shot1.png shot1.png
+            sleep 80
+            adb shell screencap -p /sdcard/shot2.png
+            adb pull /sdcard/shot2.png shot2.png
             adb logcat -d > logcat.txt
             adb shell dumpsys activity activities | head -40 > activity.txt
             grep -E "NovaGL|novalauncher|AndroidRuntime|FATAL" logcat.txt | tail -120 > filtered.txt || true
@@ -49,6 +52,7 @@ jobs:
           name: android-smoke
           path: |
             shot1.png
+            shot2.png
             logcat.txt
             filtered.txt
             activity.txt
