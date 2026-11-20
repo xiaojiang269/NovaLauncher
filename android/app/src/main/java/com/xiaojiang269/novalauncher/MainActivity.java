@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
 
     /** 屏幕方向偏好：landscape / portrait / auto，默认横屏（键位布局按 PC 设计）。 */
     private void applyOrientation() {
-        String mode = getSharedPreferences("nova_prefs", MODE_PRIVATE).getString("orient", "landscape");
+        String mode = getSharedPreferences("nova_prefs", MODE_PRIVATE).getString("orient", "auto");
         int o;
         if ("portrait".equals(mode)) o = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         else if ("auto".equals(mode)) o = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR;
@@ -102,7 +102,7 @@ public class MainActivity extends Activity {
         /** 当前屏幕方向偏好。 */
         @JavascriptInterface
         public String orientation() {
-            return getSharedPreferences("nova_prefs", MODE_PRIVATE).getString("orient", "landscape");
+            return getSharedPreferences("nova_prefs", MODE_PRIVATE).getString("orient", "auto");
         }
 
         /** 全量 MC 版本目录（含每个版本的 Java 需求），供页面渲染版本列表。 */
