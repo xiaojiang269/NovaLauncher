@@ -457,6 +457,7 @@ public class GameActivity extends Activity {
             drawKeys(c);
             if (cursorMode()) drawCursor(c);
             drawStatus(c);
+            drawBetaTag(c);
             if (editMode) drawEditOverlay(c);
             // 运行时进度不再盖在游戏画面上，改到「设置」面板里显示
             if (panel) drawRuntimeInfo(c);
@@ -737,6 +738,29 @@ public class GameActivity extends Activity {
             txt.setTextAlign(Paint.Align.RIGHT);
             txt.setColor(0xAAFFFFFF);
             c.drawText("PC 键位映射 · 方向键移动，右侧留白拖动转视角", w * 0.972f, h * 0.055f, txt);
+        }
+
+        /** 左下角「测试版」角标。 */
+        private void drawBetaTag(Canvas c) {
+            int w = getWidth(), h = getHeight();
+            float u = Math.min(w, h);
+            float ts = u * 0.024f;
+            txt.setTextAlign(Paint.Align.LEFT);
+            txt.setTextSize(ts);
+            String label = "测试版 " + VersionCatalog.APP_VERSION;
+            float tw = txt.measureText(label);
+            float left = w * 0.026f, bottom = h - h * 0.022f;
+            fill.setColor(0xCC3A2A12);
+            c.drawRoundRect(new RectF(left - u * 0.010f, bottom - ts * 1.5f,
+                    left + tw + u * 0.010f, bottom + ts * 0.45f), 6, 6, fill);
+            p.setStyle(Paint.Style.STROKE);
+            p.setStrokeWidth(1f);
+            p.setColor(0x66FFD98A);
+            c.drawRoundRect(new RectF(left - u * 0.010f, bottom - ts * 1.5f,
+                    left + tw + u * 0.010f, bottom + ts * 0.45f), 6, 6, p);
+            p.setStyle(Paint.Style.FILL);
+            txt.setColor(0xFFFFD98A);
+            c.drawText(label, left, bottom, txt);
         }
 
         private void drawPanel(Canvas c) {

@@ -17,6 +17,9 @@ import java.util.ArrayList;
  */
 public final class VersionCatalog {
 
+    /** 手机版对外版本号，固定 0.0.1（AndroidManifest 的 versionName 同步）。 */
+    public static final String APP_VERSION = "0.0.1";
+
     public static final String MANIFEST = "https://launchermeta.mojang.com/mc/game/version_manifest_v2.json";
 
     public static final class Ver {
