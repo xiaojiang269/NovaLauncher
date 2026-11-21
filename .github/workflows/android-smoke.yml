@@ -59,6 +59,8 @@ jobs:
             adb pull /sdcard/shotJump.png shotJump.png || true
             adb logcat -d > logcat.txt
             adb shell dumpsys activity activities | head -40 > activity.txt
+            adb shell "run-as com.xiaojiang269.novalauncher sh -c 'kill -3 \$(pidof com.xiaojiang269.novalauncher)'" || true
+            sleep 6
             adb shell run-as com.xiaojiang269.novalauncher cat files/mc-out.log > mc-out.log 2>&1 || true
             adb shell "run-as com.xiaojiang269.novalauncher sh -c 'for f in files/games/1.20.1/hs_err_pid*.log; do echo \"=== \$f\"; cat \$f; done'" > hs_err.log 2>&1 || true
             wc -c hs_err.log || true
