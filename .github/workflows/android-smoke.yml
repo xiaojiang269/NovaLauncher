@@ -20,7 +20,7 @@ jobs:
 
       - name: Download APK
         run: |
-          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-4.0.23-ci.apk
+          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-4.0.24-ci.apk
           ls -l app.apk
 
       - name: Run emulator and collect logs
@@ -48,6 +48,15 @@ jobs:
             sleep 150
             adb shell screencap -p /sdcard/shot3.png
             adb pull /sdcard/shot3.png shot3.png
+            # 虚拟按键实测：点一下 E（打开背包），再点一下空格（跳跃）
+            adb shell input tap 483 283 || true
+            sleep 15
+            adb shell screencap -p /sdcard/shotE.png || true
+            adb pull /sdcard/shotE.png shotE.png || true
+            adb shell input tap 541 198 || true
+            sleep 10
+            adb shell screencap -p /sdcard/shotJump.png || true
+            adb pull /sdcard/shotJump.png shotJump.png || true
             adb logcat -d > logcat.txt
             adb shell dumpsys activity activities | head -40 > activity.txt
             adb shell run-as com.xiaojiang269.novalauncher cat files/mc-out.log > mc-out.log 2>&1 || true
@@ -71,6 +80,8 @@ jobs:
             shot1.png
             shot2.png
             shot3.png
+            shotE.png
+            shotJump.png
             logcat.txt
             filtered.txt
             activity.txt
