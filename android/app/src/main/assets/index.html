@@ -320,7 +320,7 @@ body.lite *,body.lite *::before,body.lite *::after{transition:none!important;ani
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='4.0.3';
+const APP_VER='0.0.1';
 const API='https://api.github.com/repos/xiaojiang269/NovaLauncher/releases/latest';
 const IS_APP=/NovaLauncherApp/.test(navigator.userAgent);
 document.addEventListener('DOMContentLoaded',()=>{const a=document.getElementById('aboutVer');if(a)a.textContent=APP_VER;});
@@ -706,28 +706,34 @@ $('#goPC').addEventListener('click',()=>window.open(REL_PAGE,'_blank'));
 
 /* ---------- 更新检查 ---------- */
 let latest=null;
+function novaUpdStatus(msg){ if(typeof toast==='function')toast(msg); }
+window.novaUpdStatus=novaUpdStatus;
 async function checkUpdate(silent){
   const btn=$('#updBtn');btn.textContent='检查中…';
   try{
     const d=await ghJson(API);
     latest=d.tag_name;
-    // 手机版版本号与桌面 tag 不同体系，改为看 APK 资产里的版本号
+    // 手机版沿用 0.0.1 版本号，靠资产的更新时间判断有没有新版
     const apk=(d.assets||[]).filter(a=>/\.apk$/i.test(a.name)&&!/\-ci\.apk$/i.test(a.name)).sort((a,b)=>b.size-a.size)[0];
-    const av=apk?(apk.name.match(/(\d+\.\d+\.\d+)/)||[null,APP_VER])[1]:APP_VER;
-    const isNew=apk&&cmp(av,APP_VER)>0;
+    const stamp=apk?((apk.updated_at||apk.created_at||'')+'|'+apk.size):'';
+    const seen=localStorage.getItem('novaApkStamp')||'';
+    const isNew=!!apk&&stamp!==seen;
     if(isNew){
-      btn.textContent='发现新版 '+av;btn.classList.add('new');
+      btn.textContent='可更新（'+APP_VER+'）';btn.classList.add('new');
       if(!silent){
-        openDlg('发现新版本 '+av,
-          `<p>${(d.body||'NovaLauncher 新版本').slice(0,160)}</p>
-           <p class="hint">网页版更新会自动生效（下次打开即为新版）；如需桌面版请前往发布页。</p>`,
-          ['立即下载安装','稍后']);
+        openDlg('发现启动器更新',
+          `<p>手机版版本号固定为 ${APP_VER}，检测到发布页有新的安装包。</p>
+           <p class="hint">更新会直接在启动器内下载并交给系统安装器，不会跳转到浏览器或第三方应用。</p>`,
+          ['在启动器内更新','稍后']);
         $('#dlg').querySelectorAll('.btn')[0].addEventListener('click',()=>{
           $('#mask').classList.remove('on');
-          if(IS_APP){
-            if(apk&&window.NovaBridge&&NovaBridge.openUrl)NovaBridge.openUrl(apk.browser_download_url);
-            else window.open(apk?apk.browser_download_url:REL_PAGE,'_blank');
-          } else location.reload();
+          if(IS_APP&&window.NovaBridge&&NovaBridge.installUpdate){
+            NovaBridge.installUpdate(apk.browser_download_url);
+            toast('正在启动器内下载更新…');
+            localStorage.setItem('novaApkStamp',stamp);
+          }else{
+            toast('请在手机版启动器内更新');
+          }
         });
         $('#dlg').querySelectorAll('.btn')[1].addEventListener('click',()=>$('#mask').classList.remove('on'));
       }

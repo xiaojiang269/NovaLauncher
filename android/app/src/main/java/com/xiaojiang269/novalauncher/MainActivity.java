@@ -170,6 +170,25 @@ public class MainActivity extends Activity {
             }
         }
 
+        /** 启动器内直接更新（不跳浏览器）：下载新 APK 并交给系统安装器。 */
+        @JavascriptInterface
+        public void installUpdate(final String url) {
+            UpdateInstaller.start(MainActivity.this, url, new UpdateInstaller.Progress() {
+                public void onProgress(final String msg) {
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            try {
+                                web.evaluateJavascript(
+                                        "window.novaUpdStatus&&novaUpdStatus(" + org.json.JSONObject.quote(msg) + ")",
+                                        null);
+                            } catch (Throwable ignored) {
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
         @JavascriptInterface
         public String apiGet(String url) {
             HttpURLConnection c = null;
@@ -294,7 +313,27 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public String javaLaunch(final String ver, final String user) {
-            if (GameLauncher.isRunning()) return "RUNNING";
+            if (GameLaunchInline.isRunning()) return "RUNNING";
+            // 同进程 JVM：必须先在游戏容器里拿到 Surface，所以跳转 GameActivity 再启动
+            final int mem = getSharedPreferences("nova_prefs", MODE_PRIVATE).getInt("mem", 2048);
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    try {
+                        android.content.Intent i = new android.content.Intent(MainActivity.this, GameActivity.class);
+                        i.putExtra("version", ver);
+                        i.putExtra("user", user);
+                        i.putExtra("mem", mem);
+                        startActivity(i);
+                    } catch (Throwable t) {
+                        jline("启动失败：" + t);
+                    }
+                }
+            });
+            return "STARTED";
+            // 旧路径（子进程 java，拿不到 Surface）保留在下方不再执行
+        }
+
+        private void _legacyLaunch(final String ver, final String user) {
             synchronized (jlog) { jlog.setLength(0); }
             jline("准备启动 Java 版 " + ver + "，账号 " + user);
             jthread = new Thread(new Runnable() {
@@ -306,7 +345,6 @@ public class MainActivity extends Activity {
             }, "java-launch");
             jthread.setDaemon(true);
             jthread.start();
-            return "STARTED";
         }
 
         @JavascriptInterface
@@ -315,12 +353,11 @@ public class MainActivity extends Activity {
         }
 
         @JavascriptInterface
-        public boolean javaRunning() { return GameLauncher.isRunning(); }
+        public boolean javaRunning() { return GameLaunchInline.isRunning(); }
 
         @JavascriptInterface
         public void javaStop() {
-            GameLauncher.stop();
-            jline("已请求停止游戏进程");
+            jline("已请求停止游戏进程（返回桌面即可结束 JVM）");
         }
     }
 

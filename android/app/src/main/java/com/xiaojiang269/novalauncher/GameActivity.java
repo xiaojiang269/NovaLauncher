@@ -88,6 +88,60 @@ public class GameActivity extends Activity {
         world.startRuntime(getApplicationContext());
     }
 
+    // ===== 真正出画面：SurfaceView + 同进程 JVM =====
+    private android.view.SurfaceView gameSurface;
+    private android.widget.FrameLayout stage;
+    private volatile boolean inlineStarted = false;
+    private volatile boolean inlineReady = false;
+
+    private void startInline() {
+        stage = new android.widget.FrameLayout(this);
+        stage.setBackgroundColor(0xFF000000);
+
+        gameSurface = new android.view.SurfaceView(this);
+        gameSurface.setZOrderMediaOverlay(false);
+        stage.addView(gameSurface, new android.widget.FrameLayout.LayoutParams(-1, -1));
+
+        world = new WorldView(this);
+        world.fakeWorld = false;            // 不再画占位世界，真画面来自 Surface
+        stage.addView(world, new android.widget.FrameLayout.LayoutParams(-1, -1));
+        setContentView(stage);
+
+        final String ver = getIntent() == null ? "1.20.1"
+                : getIntent().getStringExtra("version");
+        final String user = getIntent() == null ? "Player"
+                : getIntent().getStringExtra("user");
+        final int mem = getIntent() == null ? 2048 : getIntent().getIntExtra("mem", 2048);
+        final String fver = ver == null ? "1.20.1" : ver;
+        final String fuser = user == null ? "Player" : user;
+
+        gameSurface.getHolder().addCallback(new android.view.SurfaceHolder.Callback() {
+            public void surfaceCreated(android.view.SurfaceHolder h) {
+                if (inlineStarted) return;
+                inlineStarted = true;
+                final android.view.Surface surf = h.getSurface();
+                try { org.lwjgl.glfw.CallbackBridge.setContext(getApplicationContext()); } catch (Throwable t) { }
+                InputPump.start(getFilesDir());
+                new Thread(new Runnable() {
+                    public void run() {
+                        world.rtStatus = "正在准备 Java / 游戏文件 …";
+                        GameLaunchInline.launch(GameActivity.this.getApplicationContext(),
+                                surf, fver, fuser, mem, new GameLaunchInline.Log() {
+                                    public void line(String s) {
+                                        world.rtLine(s);
+                                        Log.i("NovaRT", s);
+                                    }
+                                });
+                        world.rtStatus = "JVM 已退出";
+                        inlineReady = false;
+                    }
+                }, "mc-jvm").start();
+            }
+            public void surfaceChanged(android.view.SurfaceHolder h, int f, int w, int ht) { }
+            public void surfaceDestroyed(android.view.SurfaceHolder h) { }
+        });
+    }
+
     @Override
     protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -97,7 +151,7 @@ public class GameActivity extends Activity {
         if (getIntent() != null && getIntent().getBooleanExtra("skipGlProbe", false)) {
             showWorld();
         } else {
-            startGlProbe();
+            startInline();
         }
     }
 
@@ -145,6 +199,9 @@ public class GameActivity extends Activity {
         private long lastFrame = 0;
         private boolean running = true;
         private float bob = 0;
+
+        /** false = 真画面由 Surface 提供，不再画占位世界。 */
+        boolean fakeWorld = true;
 
         private int lookPtr = -1;
         private float lookLastX, lookLastY;
@@ -394,14 +451,15 @@ public class GameActivity extends Activity {
             float dt = Math.min(0.05f, (now - lastFrame) / 1000f);
             lastFrame = now;
             step(dt);
-            drawSky(c);
-            drawWorld(c);
-            drawHotbarAndBars(c);
+            // 占位世界模式下才画自己的快捷栏/血量；真机跑起来后由 MC 自带的 HUD 显示，
+            // 再叠一层会重复（用户要求：删掉下方任务栏，用游戏自带的）
+            if (fakeWorld) { drawSky(c); drawWorld(c); drawHotbarAndBars(c); }
             drawKeys(c);
             if (cursorMode()) drawCursor(c);
             drawStatus(c);
             if (editMode) drawEditOverlay(c);
-            if (rtShow && !panel) drawRuntimePanel(c);
+            // 运行时进度不再盖在游戏画面上，改到「设置」面板里显示
+            if (panel) drawRuntimeInfo(c);
             if (panel) drawPanel(c);
             if (running) postInvalidateDelayed(16);
         }
@@ -726,6 +784,9 @@ public class GameActivity extends Activity {
                     editBtn.centerY() + h * 0.010f, txt);
             txt.setTextAlign(Paint.Align.LEFT);
 
+            // 运行时进度（原画面上那个「正在准备 Java / 游戏文件」提示框挪到这里）
+            drawRuntimeInfo(c);
+
             txt.setColor(0x99FFFFFF);
             txt.setTextSize(h * 0.024f);
             c.drawText("点面板外的区域关闭", w * 0.30f, h * 0.72f, txt);
@@ -786,6 +847,38 @@ public class GameActivity extends Activity {
                 if (rtLog.length() > 4000) rtLog.delete(0, rtLog.length() - 3000);
             }
             postInvalidate();
+        }
+
+        /** 设置面板里的运行时进度区：状态一行 + 最近几行日志。 */
+        private void drawRuntimeInfo(Canvas c) {
+            int w = getWidth(), h = getHeight();
+            float u = Math.min(w, h);
+            String[] lines;
+            synchronized (rtLog) {
+                String[] all = rtLog.toString().split("\n");
+                int keep = Math.min(4, all.length);
+                lines = new String[keep];
+                System.arraycopy(all, all.length - keep, lines, 0, keep);
+            }
+            float left = w * 0.28f, top = h * 0.425f, right = w * 0.72f, bottom = h * 0.585f;
+            fill.setColor(0x99101612);
+            c.drawRoundRect(new RectF(left, top, right, bottom), 8, 8, fill);
+            p.setStyle(Paint.Style.STROKE);
+            p.setStrokeWidth(1f);
+            p.setColor(0x33FFFFFF);
+            c.drawRoundRect(new RectF(left, top, right, bottom), 8, 8, p);
+            p.setStyle(Paint.Style.FILL);
+            txt.setTextAlign(Paint.Align.LEFT);
+            txt.setTextSize(h * 0.024f);
+            txt.setColor(0xFF9FD8FF);
+            c.drawText("Java 运行环境", left + u * 0.014f, top + h * 0.030f, txt);
+            txt.setColor(rtReady ? 0xFF8FE38F : 0xFFFFD98A);
+            c.drawText(rtStatus, left + u * 0.014f, top + h * 0.062f, txt);
+            txt.setColor(0xCCFFFFFF);
+            txt.setTextSize(h * 0.019f);
+            for (int i = 0; i < lines.length; i++) {
+                c.drawText(lines[i], left + u * 0.014f, top + h * 0.090f + h * 0.0215f * i, txt);
+            }
         }
 
         private void drawRuntimePanel(Canvas c) {
@@ -941,7 +1034,7 @@ public class GameActivity extends Activity {
                             return true;
                         }
                     }
-                    if (hotbar.contains(x, y)) {
+                    if (fakeWorld && hotbar.contains(x, y)) {
                         int slot = (int) Math.floor((x - hotbar.left) / (hotbar.width() / 9f));
                         selected = Math.max(0, Math.min(8, slot));
                         invalidate();
