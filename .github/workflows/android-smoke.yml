@@ -20,7 +20,7 @@ jobs:
 
       - name: Download APK
         run: |
-          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-4.0.28-ci.apk
+          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-0.0.1-ci.apk
           ls -l app.apk
 
       - name: Run emulator and collect logs
