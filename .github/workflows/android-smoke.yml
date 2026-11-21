@@ -20,7 +20,7 @@ jobs:
 
       - name: Download APK
         run: |
-          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-4.0.13-ci.apk
+          curl -fL -o app.apk https://github.com/xiaojiang269/NovaLauncher/releases/download/v3.2.5/NovaLauncher-Android-4.0.14-ci.apk
           ls -l app.apk
 
       - name: Run emulator and collect logs
@@ -53,6 +53,9 @@ jobs:
             adb shell run-as com.xiaojiang269.novalauncher cat files/mc-out.log > mc-out.log 2>&1 || true
             adb shell "run-as com.xiaojiang269.novalauncher sh -c 'for f in files/games/1.20.1/hs_err_pid*.log; do echo \"=== \$f\"; cat \$f; done'" > hs_err.log 2>&1 || true
             wc -c hs_err.log || true
+            adb shell "run-as com.xiaojiang269.novalauncher cat /storage/emulated/0/Android/data/com.xiaojiang269.novalauncher/files/games/1.20.1/hs_err_pid*.log" > hs_err_ext.log 2>&1 || true
+            wc -c hs_err_ext.log || true
+            adb shell "run-as com.xiaojiang269.novalauncher ls -la /storage/emulated/0/Android/data/com.xiaojiang269.novalauncher/files/games/1.20.1/" > gamedir.txt 2>&1 || true
             grep -A40 "Problematic frame" hs_err.log | head -60 || true
             tail -60 mc-out.log || true
             grep -E "NovaRT|jrelog|LIBGL|NovaGL|novalauncher|AndroidRuntime|FATAL|OpenJDK" logcat.txt | tail -120 > filtered.txt || true
@@ -72,3 +75,5 @@ jobs:
             activity.txt
             mc-out.log
             hs_err.log
+            hs_err_ext.log
+            gamedir.txt
